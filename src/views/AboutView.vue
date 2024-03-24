@@ -1,15 +1,15 @@
+
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="card">
+      <Message severity="info" icon="pi pi-send">Info Message</Message>
+      <Message severity="success">
+          <template #messageicon>
+              <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" shape="circle" />
+          </template>
+          <span class="ml-2">How may I help you?</span>
+      </Message>
   </div>
 </template>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
+<script setup>
+</script>

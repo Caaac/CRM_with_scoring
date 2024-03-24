@@ -1,23 +1,24 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
+import MainLeftBar from '@/components/MainLeftBar.vue'
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="flex w-full">
+    <MainLeftBar />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-  <keep-alive>
-    <RouterView />
-  </keep-alive>
+    <main>
+      <keep-alive>
+        <RouterView />
+      </keep-alive>
+    </main>
+  </div>
+
 </template>
 
 <style scoped>
+main {
+  width: 100%;
+  padding: 0 40px 0 30px;
+}
 </style>

@@ -1,12 +1,18 @@
-@import './base.css';
+@import './base.css'; 
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 #app {
-  max-width: 1280px;
+  /* max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  font-weight: normal;
+  font-weight: normal; */
+
+  height: 100%;
+}
+
+.crm-logo {
+  width: 60%;
 }

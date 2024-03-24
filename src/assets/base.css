@@ -1,5 +1,12 @@
 /* color palette from <https://github.com/vuejs/theme> */
-:root {}
+
+:root {
+  --fs-header-desctop: 19px;
+  --fs-body-desctop: 18px;
+
+  --fs-header-laptop: 14px;
+  --fs-body-laptop: 15px;
+}
 
 *,
 *::before,
@@ -10,6 +17,7 @@
 }
 
 body {
+  height: 100%;
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
@@ -17,6 +25,12 @@ body {
     color 0.5s,
     background-color 0.5s;
   line-height: 1.6;
-  font-size: 15px;
+  font-size: var(--fs-body-desctop);
   text-rendering: optimizeLegibility;
+}
+
+@media (max-width: 1536px) {
+  body {
+    font-size: var(--fs-body-laptop);
+  }
 }
