@@ -4,7 +4,7 @@ import CRMView from '@/views/CRMView.vue'
 const routes = [
     {
         path: '/',
-        name: 'home',
+        name: 'crm',
         meta: {
             title: 'CRM',
             icon: 'mdi mdi-application-edit-outline',
