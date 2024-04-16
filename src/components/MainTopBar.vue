@@ -56,7 +56,7 @@ const items2 = ref([
 </script>
 
 <template>
-  <Menubar>
+  <Menubar class="mt-2">
     <template #start>
       <div class="flex items-center">
         <Button
@@ -111,4 +111,7 @@ const items2 = ref([
 </template>
 
 <style scoped>
+.p-menubar {
+  background-color: inherit;
+}
 </style>

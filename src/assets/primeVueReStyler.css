@@ -1,0 +1,8 @@
+.p-menu,
+.p-menubar {
+    border: none !important;
+}
+
+.p-menubar.top-menubar {
+    justify-content: space-between;
+}
