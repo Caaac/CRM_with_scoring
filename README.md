@@ -1,6 +1,8 @@
 # crm-bank
 
-This template should help get you started developing with Vue 3 in Vite.
+Проект на Vue3 Composition API с использованием Pinia, VueRouter, PrimeVue.
+База данных cloud.appwrite.io.
+Используется Drag&Drop. 
 
 ## Recommended IDE Setup
 
