@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import MainLeftBar from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue'
+
 </script>
 
 <template>

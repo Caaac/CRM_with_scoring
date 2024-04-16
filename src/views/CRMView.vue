@@ -1,33 +1,21 @@
 <script setup>
 import { onActivated, onMounted, ref } from 'vue'
+import { rootStore } from '@/stores'; const store = rootStore()
+import { storeToRefs } from 'pinia'
 
-const stages = ref([
-  { name: 'Новая', color: 'red' },
-  { name: 'В согласовании', color: 'yellow' },
-  { name: 'В очереди', color: 'green' },
-  { name: 'В работе', color: 'blue' },
-  { name: 'На проверке', color: 'gray' },
-  { name: 'Ожидание', color: 'purple' },
-  { name: 'Завершена', color: 'red' }
-])
-
-const list = ref({
-  Новая: [
-    { id: 1, name: 'First task' },
-    { id: 2, name: 'Sec task' }
-  ],
-  'В согласовании': [],
-  'В очереди': [{ id: 3, name: 'Fird task' }]
-})
+const {stages, list} = storeToRefs(store.crmStore())
 
 let crmStyles = ref({ width: '' })
 
 onMounted(() => {
-  if (window.innerWidth == 1920) {
+  if (window.innerWidth == 1920 || window.innerWidth == 1872) {
     crmStyles.value.width = '1580px'
   } else if (window.innerWidth == 1536) {
     crmStyles.value.width = '1200px'
+  } else if (window.innerWidth == 1318) {
+    crmStyles.value.width = '1000px'
   }
+  console.log(window.innerWidth);
 })
 
 const onDragstart = (e, card) => {
