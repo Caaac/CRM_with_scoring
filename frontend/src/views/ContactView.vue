@@ -1,5 +1,5 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'; const router = useRouter()
 import { ref } from 'vue'
 
 const ll = ref([
@@ -169,38 +169,35 @@ const ll = ref([
 
 const userSelect = (event) => {
   console.log(event.data)
+  // router.push({ name: 'contact', params: { idContact: event.data.id } })
+  router.push({ path: `/contact/${event.data.id}/` })
+}
+
+const send = async () => {
+  let res = await fetch('http://127.0.0.1:8000/api/v1/')
+  if (res.ok) {
+    let jsonData = await res.json()
+    console.log(jsonData);
+  } else {
+    console.log('Error:', res.status);
+  }
 }
 </script>
 
 <template>
   <div class="card">
-    <DataTable
-      :value="ll"
-      @rowSelect="userSelect"
-      selectionMode="single"
-      dataKey="id"
-      :metaKeySelection="false"
-      paginator
-      stripedRows
-      removableSort
-      :rows="5"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
-      tableStyle="width: 100%"
-    >
+    <DataTable :value="ll" @rowSelect="userSelect" selectionMode="single" dataKey="id" :metaKeySelection="false"
+      paginator stripedRows removableSort :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="width: 100%">
       <Column field="name" header="Name" style="width: 25%" sortable></Column>
       <Column field="country.name" header="Country" style="width: 25%" sortable></Column>
       <Column field="company" header="Company" style="width: 25%" sortable></Column>
-      <Column
-        field="representative.name"
-        header="Representative"
-        style="width: 25%"
-        sortable
-      ></Column>
+      <Column field="representative.name" header="Representative" style="width: 25%" sortable></Column>
     </DataTable>
 
     <RouterView />
+
+    <button @click="send">send</button>
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

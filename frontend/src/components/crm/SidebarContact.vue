@@ -1,10 +1,29 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+const router = useRouter()
+const route = useRoute()
+
+console.log('router', router);
+console.log('route', route);
+const visibleTaskSidebar = ref(true)
+
+const pushBack = () => {
+  router.push({ path: '/contact/' })
+}
+
+onMounted(() => {
+
+})
 
 </script>
 
 <template>
   <div>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi voluptates ad similique inventore ullam ipsam. Dolores ea commodi qui voluptate quibusdam accusamus repudiandae labore, quia officiis! Architecto molestiae, qui dolore ipsum minima dicta ipsam suscipit soluta eum quibusdam. Assumenda delectus odit illum possimus similique quo aliquid, cupiditate corporis autem voluptatum.
+    <Sidebar v-model:visible="visibleTaskSidebar" @hide="pushBack" class="crm-side-bar" header="wedwed"
+      position="right">
+      eded
+    </Sidebar>
   </div>
 </template>
 
