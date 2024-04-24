@@ -1,11 +1,17 @@
 <script setup>
 import { onActivated, onMounted, ref } from 'vue'
 import { rootStore } from '@/stores'; const store = rootStore()
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia';
+import SidebarCard from '@/components/crm/SidebarCard.vue'
 
-const {stages, list} = storeToRefs(store.crmStore())
+const { stages, list, visibleTaskSidebar } = storeToRefs(store.crmStore())
+const crmStyles = ref({ width: '' })
+const selectedTask = ref({})
 
-let crmStyles = ref({ width: '' })
+const selecteTask = (task) => {
+  visibleTaskSidebar.value = true
+  selectedTask.value = task
+}
 
 onMounted(() => {
   if (window.innerWidth == 1920 || window.innerWidth == 1872) {
@@ -15,7 +21,7 @@ onMounted(() => {
   } else if (window.innerWidth == 1318) {
     crmStyles.value.width = '1000px'
   }
-  console.log(window.innerWidth);
+  console.log(window.innerWidth)
 })
 
 const onDragstart = (e, card) => {
@@ -71,16 +77,18 @@ const onDrop = (e, stageName) => {
           draggable="true"
           @dragstart="onDragstart($event, card)"
         >
-          <div class="crm-crm-card-title">{{ card.name }}</div>
-          <br /><br /><br />
-          <Button>Press</Button>
+          <div class="crm-crm-card-wrapper">
+            <div class="crm-crm-card-title" @click="selecteTask(card)">{{ card.TITLE }}</div>
+            <div class="mt-2"><Tag :value="card.STAGE" /></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <SidebarCard :selectedTask="selectedTask" />
 </template>
 
-<style scoped>
+<style>
 .crm-crm-main-block {
   overflow-x: auto;
   white-space: nowrap;
@@ -104,6 +112,10 @@ const onDrop = (e, stageName) => {
   font-weight: 600;
 }
 
+.crm-crm-card-title {
+  cursor: pointer;
+}
+
 .crm-crm-cards-block {
   display: flex;
   flex-direction: column;
@@ -116,8 +128,16 @@ const onDrop = (e, stageName) => {
   border-right: none;
 }
 
+.crm-crm-card-wrapper {
+  padding: 10px 15px;
+}
+
 .p-card {
   width: 280px;
   margin: 5px;
+}
+
+.crm-side-bar {
+  width: 80%;
 }
 </style>

@@ -23,7 +23,7 @@ const routeNav = () =>
       <Image
         src="/src/assets/GSlogoHC.png"
         alt="Image"
-        imageClass="crm-logo w-full mx-auto mt-6 mb-6"
+        imageClass="crm-logo w-full mx-auto pt-6 pb-6"
       />
 
       <Menu :model="routeNav()" class="w-full">

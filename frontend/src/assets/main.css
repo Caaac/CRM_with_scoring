@@ -28,6 +28,10 @@
   height: 100%;
 }
 
+header {
+  z-index: 100;
+}
+
 .crm-logo {
   width: 60%;
 }

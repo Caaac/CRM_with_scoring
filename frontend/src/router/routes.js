@@ -1,9 +1,10 @@
-import HomeView from '../views/HomeView.vue'
+import ContactView from '@/views/ContactView.vue'
 import CRMView from '@/views/CRMView.vue'
+import SidebarContact from '@/components/crm/SidebarContact.vue'
 
 const routes = [
     {
-        path: '/',
+        path: '/crm/',
         name: 'crm',
         meta: {
             title: 'CRM',
@@ -12,7 +13,7 @@ const routes = [
         component: CRMView
     },
     {
-        path: '/about',
+        path: '/about/',
         name: 'about',
         meta: {
             title: 'About'
@@ -20,12 +21,18 @@ const routes = [
         component: () => import('@/views/AboutView.vue')
     },
     {
-        path: '/home',
-        name: 'home',
+        path: '/contact/',
+        name: 'contact',
         meta: {
-            title: 'Home'
+            title: 'Контакты'
         },
-        component: HomeView
+        component: ContactView,
+        children: [
+            {
+                path: ':idContact(\\d+)',
+                component: SidebarContact,
+            }
+        ]
     },
 ]
 
