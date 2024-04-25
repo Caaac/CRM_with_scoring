@@ -44,14 +44,3 @@ div::-webkit-scrollbar {
   display: none;
 }
 
-.crm-crm-card {
-  width: 280px;
-  min-height: 100px;
-  margin: 5px;
-  background-color: white;
-}
-
-.crm-crm-card-title {
-  font-size: 20px;
-  font-weight: bold;
-}

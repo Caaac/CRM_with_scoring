@@ -1,6 +1,8 @@
 import ContactView from '@/views/ContactView.vue'
 import CRMView from '@/views/CRMView.vue'
 import SidebarContact from '@/components/crm/SidebarContact.vue'
+import SidebarCard from '@/components/crm/SidebarCard.vue'
+import UserAccount from '@/views/user/UserAccount.vue'
 
 const routes = [
   {
@@ -8,15 +10,28 @@ const routes = [
     name: 'crm',
     meta: {
       title: 'CRM',
+      display: true,
       icon: 'mdi mdi-application-edit-outline'
     },
-    component: CRMView
+    component: CRMView,
+    children: [
+      {
+        path: ':idDeal(\\d+)/',
+        component: SidebarCard
+      },
+      {
+        path: 'contact/:idContact(\\d+)/',
+        component: SidebarContact
+      }
+    ]
   },
   {
-    path: '/about/',
-    name: 'about',
+    path: '/company/',
+    name: 'company',
     meta: {
-      title: 'About'
+      title: 'Компании',
+      display: true,
+      icon: 'mdi mdi-domain'
     },
     component: () => import('@/views/AboutView.vue')
   },
@@ -24,7 +39,9 @@ const routes = [
     path: '/contact/',
     name: 'contact',
     meta: {
-      title: 'Контакты'
+      title: 'Контакты',
+      display: true,
+      icon: 'mdi mdi-account-group'
     },
     component: ContactView,
     children: [
@@ -33,6 +50,15 @@ const routes = [
         component: SidebarContact
       }
     ]
+  },
+  {
+    path: '/user/account/',
+    name: 'userAccount',
+    meta: {
+      title: 'Личный кабинет',
+      display: false
+    },
+    component: UserAccount,
   }
 ]
 

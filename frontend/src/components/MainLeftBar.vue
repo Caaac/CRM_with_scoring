@@ -6,7 +6,8 @@ const router = useRouter()
 const routeNav = () =>
   router.options.routes.reduce((acc, route) => {
     const title = route.meta?.title
-    if (title) {
+    const display = route.meta?.display
+    if (title && display) {
       acc.push({
         path: route.path,
         icon: route.meta?.icon ?? 'mdi mdi-atom',
@@ -24,6 +25,7 @@ const routeNav = () =>
         src="/src/assets/GSlogoHC.png"
         alt="Image"
         imageClass="crm-logo w-full mx-auto pt-6 pb-6"
+        @click="router.push({ path:'/crm/' })"
       />
 
       <Menu :model="routeNav()" class="w-full">
@@ -42,7 +44,7 @@ const routeNav = () =>
             <!-- <Badge v-if="item.badge" class="ml-auto" :value="item.badge" /> -->
           </div>
         </template>
-        <template #end>
+        <!-- <template #end>
           <button
             v-ripple
             class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
@@ -57,7 +59,7 @@ const routeNav = () =>
               <span class="text-sm">Admin</span>
             </span>
           </button>
-        </template>
+        </template> -->
       </Menu>
     </div>
   </header>

@@ -1,17 +1,13 @@
 <script setup>
 import { onActivated, onMounted, ref } from 'vue'
-import { rootStore } from '@/stores'; const store = rootStore()
-import { storeToRefs } from 'pinia';
-import SidebarCard from '@/components/crm/SidebarCard.vue'
+import { rootStore } from '@/stores'
+const store = rootStore()
+import { storeToRefs } from 'pinia'
+import { RouterView, useRouter } from 'vue-router'
+const router = useRouter()
 
-const { stages, list, visibleTaskSidebar } = storeToRefs(store.crmStore())
+const { stages, list } = storeToRefs(store.crmStore())
 const crmStyles = ref({ width: '' })
-const selectedTask = ref({})
-
-const selecteTask = (task) => {
-  visibleTaskSidebar.value = true
-  selectedTask.value = task
-}
 
 onMounted(() => {
   if (window.innerWidth == 1920 || window.innerWidth == 1872) {
@@ -61,7 +57,10 @@ const onDrop = (e, stageName) => {
 <template>
   <div class="crm-crm-main-block" ref="mainBlock" :style="crmStyles">
     <div v-for="stage in stages" :key="stage.name" class="crm-crm-stage-block">
-      <div class="crm-crm-stage-title" :style="{ 'background-color': stage.color }">
+      <div
+        class="crm-crm-stage-title"
+        :style="{ 'background-color': stage.color, color: stage?.textColor }"
+      >
         {{ stage.name }}
       </div>
       <div
@@ -78,14 +77,28 @@ const onDrop = (e, stageName) => {
           @dragstart="onDragstart($event, card)"
         >
           <div class="crm-crm-card-wrapper">
-            <div class="crm-crm-card-title" @click="selecteTask(card)">{{ card.TITLE }}</div>
-            <div class="mt-2"><Tag :value="card.STAGE" /></div>
+            <div class="crm-crm-card-title" @click="router.push({ path: `/crm/${card.id}/` })">
+              {{ card.TITLE }}
+            </div>
+            <div class="crm-crm-card-price">1000 ₽</div>
+            <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/${1}/` })">Михаил</div>
+            <!-- <div class="crm-crm-card-client" @click="router.push({ path: `/company/${1}/` })">ООО "MywebStor"</div> -->
+            <div class="flex items-center justify-between mt-2">
+              <Avatar
+                label="U"
+                class=""
+                shape="circle"
+                style="background-color: #ece9fc; color: #2a1261"
+              />
+              <div><Tag :value="card.STAGE" /></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <SidebarCard :selectedTask="selectedTask" />
+  <!-- <SidebarCard :selectedTask="selectedTask" /> -->
+  <RouterView />
 </template>
 
 <style>
@@ -98,7 +111,7 @@ const onDrop = (e, stageName) => {
 }
 
 .crm-crm-stage-block {
-  min-width: 300px;
+  min-width: 270px;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -112,8 +125,43 @@ const onDrop = (e, stageName) => {
   font-weight: 600;
 }
 
+.crm-crm-card {
+  width: 250px;
+  height: 100%;
+  margin: 5px;
+  background-color: white;
+}
+
+.crm-crm-card:hover {
+  margin-top: 3px;
+  margin-bottom: 7px;
+}
+
 .crm-crm-card-title {
   cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  color: #3a4963 ;
+}
+
+.crm-crm-card-title:hover {
+  color: #1853b9 ;
+}
+
+.crm-crm-card-price {
+  font-size: 14px;
+  color: #535c6a;
+}
+
+.crm-crm-card-client {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4620b0;
+  cursor: pointer;
+}
+
+.crm-crm-card-client:hover {
+  text-decoration:underline;
 }
 
 .crm-crm-cards-block {
@@ -130,6 +178,8 @@ const onDrop = (e, stageName) => {
 
 .crm-crm-card-wrapper {
   padding: 10px 15px;
+  height: 100%;
+  width: 100%;
 }
 
 .p-card {

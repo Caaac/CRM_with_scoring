@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
+const router = useRouter()
+
 
 const pageTitle = () => {
-  const route = useRoute()
   return route.meta?.title || '&'
 }
 
@@ -11,25 +13,30 @@ const gg = () => {
   console.log('1')
 }
 
-const menu = ref()
-const toggle = (event) => {
-  menu.value.toggle(event)
+const profileMenu = ref()
+const toggleProfileMenu = (event) => {
+  profileMenu.value.toggle(event)
 }
 
-const items = ref([
+const settingsMenu = ref()
+const toggleSettingsMenu = (event) => {
+  settingsMenu.value.toggle(event)
+}
+
+const accountMenu = ref([
   {
-    label: 'Options',
+    label: 'Персональный раздел',
     items: [
       {
-        label: 'Refresh',
-        icon: 'mdi mdi-arrow-left',
+        label: 'Личный кабинет',
+        icon: 'mdi mdi-account',
         command: () => {
-          console.log('222')
+          router.push({ path: '/user/account/' })
         }
       },
       {
-        label: 'Export',
-        icon: 'mdi mdi-arrow-left'
+        label: 'Выйти',
+        icon: 'mdi mdi-exit-to-app'
       }
     ]
   }
@@ -72,7 +79,7 @@ const items2 = ref([
     <template #end>
       <div class="flex align-items-center gap-2">
         <Button
-          @click="toggle"
+          @click="toggleProfileMenu"
           icon="mdi mdi-cog-outline crm-menubar-btn"
           text
           rounded
@@ -85,10 +92,10 @@ const items2 = ref([
             shape="circle"
           />
         </Button>
-        <Menu ref="menu" id="crm-profile-menu" :model="items2" :popup="true" />
+        <Menu ref="profileMenu" id="crm-profile-menu" :model="accountMenu" :popup="true" />
 
         <Button
-          @click="toggle"
+          @click="toggleSettingsMenu"
           icon="mdi mdi-cog-outline crm-menubar-btn"
           text
           rounded
@@ -96,7 +103,7 @@ const items2 = ref([
           aria-haspopup="true"
           aria-controls="crm-settings-menu"
         />
-        <Menu ref="menu" id="crm-settings-menu" :model="items" :popup="true" />
+        <Menu ref="settingsMenu" id="crm-settings-menu" :model="items2" :popup="true" />
 
         <Button
           icon="mdi mdi-arrow-left crm-menubar-btn"

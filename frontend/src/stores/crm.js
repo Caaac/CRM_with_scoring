@@ -2,16 +2,13 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useCrmStore = defineStore('crm', () => {
-  const visibleTaskSidebar = ref(false)
-  
   const stages = ref([
-    { name: 'Новая', color: 'red' },
-    { name: 'В согласовании', color: 'yellow' },
-    { name: 'В очереди', color: 'green' },
-    { name: 'В работе', color: 'blue' },
-    { name: 'На проверке', color: 'gray' },
-    { name: 'Ожидание', color: 'purple' },
-    { name: 'Завершена', color: 'red' }
+    { name: 'Новая', color: '#3ff26b' },
+    { name: 'В согласовании', color: '#12c317', textColor: 'white' },
+    { name: 'В очереди', color: '#8ad79f' },
+    { name: 'В работе', color: '#ace9fb' },
+    { name: 'На проверке', color: '#8c3f87', textColor: 'white' },
+    { name: 'Завершена', color: '#5e36a0', textColor: 'white' },
   ])
 
   const list = ref({
@@ -23,5 +20,5 @@ export const useCrmStore = defineStore('crm', () => {
     'В очереди': [{ id: 3, TITLE: 'Fird task', STAGE:'В работе', COMMENT: '' }]
   })
 
-  return {stages, list, visibleTaskSidebar }
+  return {stages, list }
 })

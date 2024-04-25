@@ -196,7 +196,7 @@ const send = async () => {
 
     <RouterView />
 
-    <button @click="send">send</button>
+    <button class="btn" @click="send">send</button>
   </div>
 </template>
 

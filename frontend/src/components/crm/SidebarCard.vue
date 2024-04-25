@@ -1,25 +1,47 @@
 <script setup>
-// import Sidebar from "primevue/sidebar"
-import { rootStore } from '@/stores'; const store = rootStore()
-import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router'
+const router = useRouter()
+import { ref } from 'vue'
+import SidebarCardGeneral from '@/components/crm/sidebar-card-tabs/SidebarCardGeneral.vue';
 
-const { visibleTaskSidebar } = storeToRefs(store.crmStore())
+const visibleDealSidebar = ref(true)
 
-const props = defineProps(['selectedTask'])
-
+const pushBack = () => {
+  router.push({ path: '/crm/' })
+}
 </script>
 
 <template>
-  <div>
+  <div class="crm-crm-sidebar-card">
     <Sidebar
-      v-model:visible="visibleTaskSidebar"
+      v-model:visible="visibleDealSidebar"
+      @hide="pushBack"
       class="crm-side-bar"
-      :header="selectedTask.TITLE"
+      :header="'dede'"
       position="right"
     >
-      {{ selectedTask }}
+      <div class="card">
+        <TabView class="aaa">
+          <TabPanel header="Общее">
+            <SidebarCardGeneral />
+          </TabPanel>
+          <TabPanel header="Анализ">
+            <SidebarCardAnalitic />
+          </TabPanel>
+        </TabView>
+      </div>
     </Sidebar>
   </div>
 </template>
 
-<style></style>
+<style>
+.crm-side-bar {
+  background-color: #eef2f4
+}
+
+.crm-side-bar .p-tabview .p-tabview-nav,
+.crm-side-bar .p-tabview .p-tabview-panels,
+.crm-side-bar .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: inherit;
+}
+</style>
