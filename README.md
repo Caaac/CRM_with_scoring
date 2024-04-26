@@ -2,7 +2,7 @@
 ***
 ## Frontend
 
-### Фронтенд выполнен на Vue3 Composition API с ипользованием Router, Pinia, PrimeVue. Реализован механиз Drag&Drop.
+### Фронтенд выполнен на Vue3 Composition API с ипользованием Router, Pinia, PrimeVue. Реализован механиз Drag&Drop. Для Http запросов используется axios
 ***
 ## Backend
 
