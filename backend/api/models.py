@@ -7,10 +7,13 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+
 class Company(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='NAME', max_length=255)  # Field name made lowercase.
     ful_name = models.CharField(db_column='FUL_NAME', max_length=255)  # Field name made lowercase.
+    representative_name = models.CharField(db_column='REPRESENTATIVE_NAME', max_length=255)  # Field name made lowercase.
+    representative_last_name = models.CharField(db_column='REPRESENTATIVE_LAST_NAME', max_length=255)  # Field name made lowercase.
     address = models.CharField(db_column='ADDRESS', max_length=255)  # Field name made lowercase.
     inn = models.BigIntegerField(db_column='INN')  # Field name made lowercase.
     kpp = models.BigIntegerField(db_column='KPP')  # Field name made lowercase.
@@ -41,6 +44,7 @@ class Contact(models.Model):
 class CrmDeal(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     title = models.CharField(db_column='TITLE', max_length=255)  # Field name made lowercase.
+    loan_amount = models.BigIntegerField(db_column='LOAN_AMOUNT')  # Field name made lowercase.
     stage = models.CharField(db_column='STAGE', max_length=255)  # Field name made lowercase.
     contant = models.ForeignKey(Contact, models.DO_NOTHING, db_column='CONTANT_ID', blank=True, null=True)  # Field name made lowercase.
     company = models.ForeignKey(Company, models.DO_NOTHING, db_column='COMPANY_ID', blank=True, null=True)  # Field name made lowercase.

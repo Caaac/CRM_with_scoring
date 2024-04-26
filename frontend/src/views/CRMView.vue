@@ -81,7 +81,7 @@ const onDrop = (e, stageName) => {
               {{ card.TITLE }}
             </div>
             <div class="crm-crm-card-price">1000 ₽</div>
-            <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/${1}/` })">Михаил</div>
+            <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/details/${1}/` })">Михаил</div>
             <!-- <div class="crm-crm-card-client" @click="router.push({ path: `/company/${1}/` })">ООО "MywebStor"</div> -->
             <div class="flex items-center justify-between mt-2">
               <Avatar

@@ -1,8 +1,10 @@
 import ContactView from '@/views/ContactView.vue'
 import CRMView from '@/views/CRMView.vue'
-import SidebarContact from '@/components/crm/SidebarContact.vue'
+import SidebarContact from '@/components/contact/SidebarContact.vue'
 import SidebarCard from '@/components/crm/SidebarCard.vue'
 import UserAccount from '@/views/user/UserAccount.vue'
+
+import Test from '@/views/Test.vue'
 
 const routes = [
   {
@@ -20,7 +22,7 @@ const routes = [
         component: SidebarCard
       },
       {
-        path: 'contact/:idContact(\\d+)/',
+        path: 'contact/details/:idContact(\\d+)/',
         component: SidebarContact
       }
     ]
@@ -46,7 +48,7 @@ const routes = [
     component: ContactView,
     children: [
       {
-        path: ':idContact(\\d+)/',
+        path: 'details/:idContact(\\d+)/',
         component: SidebarContact
       }
     ]
@@ -59,6 +61,15 @@ const routes = [
       display: false
     },
     component: UserAccount,
+  },
+  {
+    path: '/test/',
+    name: 'test',
+    meta: {
+      title: 'Тестовая страница',
+      display: true
+    },
+    component: Test,
   }
 ]
 

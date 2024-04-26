@@ -1,8 +1,23 @@
 <script setup>
 import { RouterView } from 'vue-router'
+import { onMounted } from 'vue';
+import { rootStore } from '@/stores'
+import { storeToRefs } from 'pinia';
+
 import MainLeftBar from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue'
 import Toast from 'primevue/toast';
+
+const store = rootStore()
+
+const { contacts } = storeToRefs(store.contactStore())
+
+onMounted(() => {
+  store.contactStore().getContact()
+    .then(r => {
+      store.settingsStore().isLoading = false
+    })
+})
 
 </script>
 
