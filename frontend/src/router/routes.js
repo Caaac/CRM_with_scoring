@@ -1,6 +1,7 @@
 import ContactView from '@/views/ContactView.vue'
 import CRMView from '@/views/CRMView.vue'
 import SidebarContact from '@/components/contact/SidebarContact.vue'
+import SidebarCompany from '@/components/company/SidebarCompany.vue'
 import SidebarCard from '@/components/crm/SidebarCard.vue'
 import UserAccount from '@/views/user/UserAccount.vue'
 
@@ -35,7 +36,13 @@ const routes = [
       display: true,
       icon: 'mdi mdi-domain'
     },
-    component: () => import('@/views/AboutView.vue')
+    component: () => import('@/views/AboutView.vue'),
+    children: [
+      {
+        path: 'details/:idContact(\\d+)/',
+        component: SidebarCompany
+      }
+    ]
   },
   {
     path: '/contact/',

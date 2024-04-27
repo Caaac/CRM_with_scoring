@@ -1,9 +1,9 @@
 <script setup>
 import { onActivated, onMounted, ref } from 'vue'
 import { rootStore } from '@/stores'
-const store = rootStore()
 import { storeToRefs } from 'pinia'
 import { RouterView, useRouter } from 'vue-router'
+const store = rootStore()
 const router = useRouter()
 
 const { stages, list } = storeToRefs(store.crmStore())

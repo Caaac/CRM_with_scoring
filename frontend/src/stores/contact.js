@@ -189,5 +189,9 @@ export const useContactStore = defineStore('contact', () => {
     })
   }
 
-  return { contacts, getContact }
+  const findContactById = (id) => {
+    return contacts.value.find(el => el.id == id)
+  }
+
+  return { contacts, getContact, findContactById }
 })
