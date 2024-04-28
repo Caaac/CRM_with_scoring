@@ -10,10 +10,16 @@ import Toast from 'primevue/toast';
 
 const store = rootStore()
 
-const { contacts } = storeToRefs(store.contactStore())
+// const { contacts } = storeToRefs(store.contactStore())
+const { companies } = storeToRefs(store.companyStore())
 
 onMounted(() => {
-  store.contactStore().getContact()
+  // store.contactStore().getContact()
+  //   .then(r => {
+  //     store.settingsStore().isLoading = false
+  //   })
+
+  store.companyStore().getCompany()
     .then(r => {
       store.settingsStore().isLoading = false
     })
@@ -29,9 +35,9 @@ onMounted(() => {
       <MainTopBar class="top-menubar" />
       <Divider class="mb-5" />
       <div class="v-main">
-        <keep-alive>
+        <KeepAliveProps>
           <RouterView />
-        </keep-alive>
+        </KeepAliveProps >
       </div>
     </main>
 

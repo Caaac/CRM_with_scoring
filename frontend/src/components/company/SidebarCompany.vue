@@ -1,5 +1,8 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import SidebarCompanyAbout from '@/components/company/sidebar-company-info/SidebarCompanyAbout.vue'
+import SidebarCompanyCreate from '@/components/company/sidebar-company-info/SidebarCompanyCreate.vue'
+
+import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { rootStore } from '@/stores'
 import { storeToRefs } from 'pinia'
@@ -8,67 +11,54 @@ const store = rootStore()
 const router = useRouter()
 const route = useRoute()
 
-const contactDetail = ref()
+const visibleCompanySidebar = ref(true)
+const { companyDetail } = storeToRefs(store.companyStore())
 
-console.log('router', router)
-console.log('route', route)
+onMounted(() => {
+  // TODO За исключением ситуации, когда создается компания
+  if (route.params.idCompany != 0)
+    store.companyStore().companyDetail = store.companyStore().findCompanyById(route.params.idCompany)
+})
 
-const visibleContactSidebar = ref(true)
+
 const isCreate = computed(() => {
-  return route.params.idContact === '0'
+  return route.params.idCompany === '0'
 })
 
 const pushBack = () => {
   if (
-    route.path.includes('/crm/contact/details/') &&
-    route.path.indexOf('/crm/contact/details/') === 0
+    route.path.includes('/crm/company/details/') &&
+    route.path.indexOf('/crm/company/details/') === 0
   )
     router.push({ path: '/crm/' })
-  else if (route.path.includes('/contact/') && route.path.indexOf('/contact/') === 0)
-    router.push({ path: '/contact/' })
+  else if (route.path.includes('/company/') && route.path.indexOf('/company/') === 0)
+    router.push({ path: '/company/' })
+
+  store.companyStore().companyDetail = {}
 }
 
-onMounted(() => {
-  console.log(route.params.idContact)
-  console.log(store.contactStore().findContactById(route.params.idContact))
-  contactDetail.value = store.contactStore().findContactById(route.params.idContact)
+watch(route, (to, from) => {
+  console.log(to, from);
+  if (to.params.idCompany > 0) {
+    store.companyStore().getCompany()
+      .then(r => {
+        store.companyStore().companyDetail = store.companyStore().findCompanyById(route.params.idCompany)
+      })
+  }
 })
 </script>
 
 <template>
   <div>
-    <Sidebar
-      v-model:visible="visibleContactSidebar"
-      @hide="pushBack"
-      class="crm-side-bar"
-      header="wedwed"
-      position="right"
-    >
-      <div class="crm-contact-about-deal-main">
-        <div class="crm-contact-about-deal">
-          <div class="crm-contact-about-deal-wrapper">
-            {{ contactDetail }}
-          </div>
-        </div>
+    <Sidebar v-model:visible="visibleCompanySidebar" @hide="pushBack" class="crm-side-bar"
+      :header="companyDetail?.ful_name || 'Создание новой компании'" position="right">
+      <Divider class="sidebar-header-divider" />
+      <div class="crm-sidebar-about-main">
+        <SidebarCompanyCreate v-if="isCreate" />
+        <SidebarCompanyAbout v-else />
       </div>
-
-      <p>{{ isCreate ? 'Новый контакт' : 'Эх нет' }}</p>
-      {{ route }}
     </Sidebar>
   </div>
 </template>
 
-<style>
-.crm-contact-about-deal {
-  background: white;
-}
-
-.crm-contact-about-deal {
-  width: 41%;
-  border-radius: 16px;
-}
-
-.crm-contact-about-deal-wrapper {
-  padding: 10px;
-}
-</style>
+<style></style>

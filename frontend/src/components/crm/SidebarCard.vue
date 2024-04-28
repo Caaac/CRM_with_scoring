@@ -35,13 +35,5 @@ const pushBack = () => {
 </template>
 
 <style>
-.crm-side-bar {
-  background-color: #eef2f4
-}
 
-.crm-side-bar .p-tabview .p-tabview-nav,
-.crm-side-bar .p-tabview .p-tabview-panels,
-.crm-side-bar .p-tabview .p-tabview-nav li .p-tabview-nav-link {
-  background: inherit;
-}
 </style>

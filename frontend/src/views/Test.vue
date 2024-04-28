@@ -85,8 +85,8 @@ const postAxios = () => {
 <template>
     <div>
         <Button @click="getAxios">Get Axios</Button>
-        <Button class="ms-2" @click="delAxios">Del Axios</Button>
-        <Button class="ms-2" @click="postAxios">Post Axios</Button>
+        <Button class="ms-2" disabled @click="delAxios">Del Axios</Button>
+        <Button class="ms-2" disabled @click="postAxios">Post Axios</Button>
         <Button class="ms-2" disabled @click="send">Send</Button>
         <Button class="ms-2" @click="sendResult = null">cls</Button>
         {{ sendResult }}

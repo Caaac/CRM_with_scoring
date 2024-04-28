@@ -44,3 +44,22 @@ div::-webkit-scrollbar {
   display: none;
 }
 
+.crm-side-bar {
+  background-color: #eef2f4;
+  border-radius: 16px 0px 0px 16px 
+}
+
+.crm-side-bar .p-tabview .p-tabview-nav,
+.crm-side-bar .p-tabview .p-tabview-panels,
+.crm-side-bar .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  background: inherit;
+}
+
+.sidebar-header-divider {
+  margin-bottom: 15px;
+}
+
+.sidebar-header-divider::before {
+  border: 1px solid #ced4da;
+}
+

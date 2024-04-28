@@ -42,8 +42,25 @@ def company_list(request):
         return JsonResponse({'message': '{} Companies were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
     
     
+@api_view(['GET', 'PUT', 'DELETE'])    
 def company_detail(request, pk):
-    pass
+    company = Company.objects.get(pk=pk)
+    
+    if request.method == 'GET': 
+        company_serializer = CompanySerializer(company) 
+        return JsonResponse(company_serializer.data)
+
+    elif request.method == 'PUT': 
+        company_data = JSONParser().parse(request) 
+        company_serializer = CompanySerializer(company, data=company_data) 
+        if company_serializer.is_valid(): 
+            company_serializer.save() 
+            return JsonResponse(company_serializer.data) 
+        return JsonResponse(company_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE': 
+        company.delete() 
+        return JsonResponse({'message': 'Company was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
 
 

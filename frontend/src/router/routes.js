@@ -1,4 +1,5 @@
 import ContactView from '@/views/ContactView.vue'
+import CompanyView from '@/views/CompanyView.vue'
 import CRMView from '@/views/CRMView.vue'
 import SidebarContact from '@/components/contact/SidebarContact.vue'
 import SidebarCompany from '@/components/company/SidebarCompany.vue'
@@ -36,10 +37,10 @@ const routes = [
       display: true,
       icon: 'mdi mdi-domain'
     },
-    component: () => import('@/views/AboutView.vue'),
+    component: CompanyView,
     children: [
       {
-        path: 'details/:idContact(\\d+)/',
+        path: 'details/:idCompany(\\d+)/',
         component: SidebarCompany
       }
     ]
