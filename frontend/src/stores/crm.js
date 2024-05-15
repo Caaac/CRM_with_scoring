@@ -1,24 +1,66 @@
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
+import { rootStore } from '@/stores'
 
 export const useCrmStore = defineStore('crm', () => {
-  const stages = ref([
-    { name: 'Новая', color: '#3ff26b' },
-    { name: 'В согласовании', color: '#12c317', textColor: 'white' },
-    { name: 'В очереди', color: '#8ad79f' },
-    { name: 'В работе', color: '#ace9fb' },
-    { name: 'На проверке', color: '#8c3f87', textColor: 'white' },
-    { name: 'Завершена', color: '#5e36a0', textColor: 'white' },
-  ])
+  const $axios = inject('$axios')
+  const store = rootStore()
 
-  const list = ref({
-    Новая: [
-      { id: 1, TITLE: 'First task', STAGE:'На проверке', COMMENT: ''},
-      { id: 2, TITLE: 'Sec task', STAGE:'Новая', COMMENT: '' }
-    ],
-    'В согласовании': [],
-    'В очереди': [{ id: 3, TITLE: 'Fird task', STAGE:'В работе', COMMENT: '' }]
-  })
+  const list = ref({})
+  const dealDetail = ref({})
 
-  return {stages, list }
+  const getDeal = () => {
+    return new Promise((reject, resolve) => {
+      $axios
+        .get('crm-deal/')
+        .then(function (response) {
+          const resp = response.data
+          const listOfStage = store.settingsStore().stages.map(stage => stage.code)
+          const req = {}
+
+          listOfStage.forEach(stage => {
+            req[stage] = []
+          })
+
+          resp.forEach(deal => {
+            req[deal.stage].push(deal)
+          })
+          list.value = req
+
+          reject(response)
+        })
+        .catch(function (error) {
+          resolve(error)
+        })
+    })
+  }
+
+  const updateDeal = async(id, dealData = {}) => {
+    if (!dealData) dealData = findDealById(id)
+    Reflect.deleteProperty(dealData, 'id')
+    console.log(dealData);
+    return new Promise((reject, resolve) => {
+      $axios
+        .put(`crm-deal/${id}`, dealData)
+        .then(function (response) {
+          console.log('yes');
+          reject(response)
+        })
+        .catch(function (error) {
+          console.log('no');
+          resolve(error)
+        })
+    })
+  }
+
+  const findDealById = (id) => {
+    let req = {}
+    Object.keys(list.value).forEach((key) => {
+      const res = list.value[key].find(deal => deal.id == id)
+      if (res) req = res
+    })
+    return req
+  }
+
+  return { list, getDeal, updateDeal, dealDetail, findDealById }
 })

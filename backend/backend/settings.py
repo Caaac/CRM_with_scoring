@@ -90,6 +90,10 @@ DATABASES = {
         'PASSWORD': 'qwerty1309',
         'HOST': '127.0.0.1',
         'PORT': '3306 ',
+        # "COLLATION": "utf8mb3_bin",
+        # "TEST": {
+        #     "COLLATION": "utf8mb3_bin",
+        # },
     }
 }
 
@@ -131,3 +135,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+
+# Logs
+# https://docs.djangoproject.com/en/5.0/topics/logging/
+
+import os
+import datetime
+# from pythonjsonlogger import jsonlogger
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.getenv("DJANGO_LOG_LEVEL", "./logs/" + datetime.date.today().isoformat() + ".log"),
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'api': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

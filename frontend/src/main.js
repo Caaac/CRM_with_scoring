@@ -9,6 +9,7 @@ import App from '@/App.vue'
 import Router from '@/router'
 
 import Axios from '@/api/axios'
+import '@/mixins/date'
 
 const pinia = createPinia()
 const app = createApp(App)

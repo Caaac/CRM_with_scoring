@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user'
 import { useContactStore } from '@/stores/contact'
 import { useCompanyStore } from '@/stores/company'
 import { useSettingsStore } from '@/stores/settings'
+import { useLandingRateStore } from '@/stores/landingRate'
 
 export const rootStore = defineStore('root', () => {
   const crmStore = () => {
@@ -26,5 +27,9 @@ export const rootStore = defineStore('root', () => {
     return useCompanyStore()
   }
 
-  return { crmStore, userStore, contactStore, settingsStore, companyStore }
+  const landingRateStore = () => {
+    return useLandingRateStore()
+  }
+
+  return { crmStore, userStore, contactStore, settingsStore, companyStore, landingRateStore }
 })

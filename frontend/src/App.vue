@@ -2,27 +2,28 @@
 import { RouterView } from 'vue-router'
 import { onMounted } from 'vue';
 import { rootStore } from '@/stores'
-import { storeToRefs } from 'pinia';
 
 import MainLeftBar from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue'
-import Toast from 'primevue/toast';
+import Toast from 'primevue/toast'
 
 const store = rootStore()
 
-// const { contacts } = storeToRefs(store.contactStore())
-const { companies } = storeToRefs(store.companyStore())
-
 onMounted(() => {
-  // store.contactStore().getContact()
-  //   .then(r => {
-  //     store.settingsStore().isLoading = false
-  //   })
-
-  store.companyStore().getCompany()
+  Promise.all([
+    store.settingsStore().getStages(),
+    store.settingsStore().getSource(),
+  ])
+    .then(_ => Promise.all([
+      store.companyStore().getCompany(),
+      store.landingRateStore().getLandingRate(),
+      store.crmStore().getDeal(),
+    ])
+    )
     .then(r => {
       store.settingsStore().isLoading = false
     })
+
 })
 
 </script>
@@ -34,10 +35,12 @@ onMounted(() => {
     <main>
       <MainTopBar class="top-menubar" />
       <Divider class="mb-5" />
-      <div class="v-main">
+      
+      <ProgressBar v-if="store.settingsStore().isLoading" mode="indeterminate" style="height: 6px"></ProgressBar>
+      <div v-else class="v-main">
         <KeepAliveProps>
           <RouterView />
-        </KeepAliveProps >
+        </KeepAliveProps>
       </div>
     </main>
 

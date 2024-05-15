@@ -35,13 +35,6 @@ class Contact(models.Model):
     source = models.CharField(db_column='SOURCE', max_length=255)  # Field name made lowercase.
     phone = models.BigIntegerField(db_column='PHONE')  # Field name made lowercase.
     email = models.CharField(db_column='EMAIL', max_length=255)  # Field name made lowercase.
-    person_age = models.IntegerField(db_column='PERSON_AGE', blank=True, null=True)  # Field name made lowercase.
-    person_income = models.BigIntegerField(db_column='PERSON_INCOME', blank=True, null=True)  # Field name made lowercase.
-    person_home_ownership = models.BigIntegerField(db_column='PERSON_HOME_OWNERSHIP', blank=True, null=True)  # Field name made lowercase.
-    person_emp_length = models.FloatField(db_column='PERSON_EMP_LENGTH', blank=True, null=True)  # Field name made lowercase.
-    loan_grade = models.CharField(db_column='LOAN_GRADE', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    cb_person_cred_hist_length = models.BigIntegerField(db_column='CB_PERSON_CRED_HIST_LENGTH', blank=True, null=True)  # Field name made lowercase.
-    cb_person_default_on_file = models.IntegerField(db_column='CB_PERSON_DEFAULT_ON_FILE', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -58,12 +51,10 @@ class CrmDeal(models.Model):
     responsible = models.ForeignKey('Users', models.DO_NOTHING, db_column='RESPONSIBLE_ID')  # Field name made lowercase.
     source = models.CharField(db_column='SOURCE', max_length=255, blank=True, null=True)  # Field name made lowercase.
     comment = models.TextField(db_column='COMMENT', blank=True, null=True)  # Field name made lowercase.
-    date_closed = models.DateField(db_column='DATE_CLOSED', blank=True, null=True)  # Field name made lowercase.
+    date_closed = models.DateField(db_column='DATE_CLOSED')  # Field name made lowercase.
     landing_rate = models.ForeignKey('LandingRate', models.DO_NOTHING, db_column='LANDING_RATE_ID')  # Field name made lowercase.
     result = models.IntegerField(db_column='RESULT', blank=True, null=True)  # Field name made lowercase.
     profit = models.BigIntegerField(db_column='PROFIT', blank=True, null=True)  # Field name made lowercase.
-    loan_duration = models.BigIntegerField(db_column='LOAN_DURATION', blank=True, null=True)  # Field name made lowercase.
-    loan_status = models.BigIntegerField(db_column='LOAN_STATUS', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -74,7 +65,6 @@ class LandingRate(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     title = models.CharField(db_column='TITLE', max_length=255)  # Field name made lowercase.
     rate = models.FloatField(db_column='RATE')  # Field name made lowercase.
-    loan_intent = models.CharField(db_column='LOAN_INTENT', max_length=255)  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -83,7 +73,7 @@ class LandingRate(models.Model):
 
 class Statement(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    created_by = models.ForeignKey('Users', models.DO_NOTHING, db_column='CREATED_BY')  # Field name made lowercase.
+    created_by = models.IntegerField(db_column='CREATED_BY')  # Field name made lowercase.
     count_month = models.IntegerField(db_column='COUNT_MONTH')  # Field name made lowercase.
     count_contact = models.IntegerField(db_column='COUNT_CONTACT')  # Field name made lowercase.
     count_company = models.IntegerField(db_column='COUNT_COMPANY')  # Field name made lowercase.
@@ -96,7 +86,7 @@ class Statement(models.Model):
 
 
 class Users(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id = models.OneToOneField(Statement, models.DO_NOTHING, db_column='ID', primary_key=True)  # Field name made lowercase.
     name = models.CharField(db_column='NAME', max_length=255)  # Field name made lowercase.
     last_name = models.CharField(db_column='LAST_NAME', max_length=255)  # Field name made lowercase.
     email = models.CharField(db_column='EMAIL', max_length=255)  # Field name made lowercase.

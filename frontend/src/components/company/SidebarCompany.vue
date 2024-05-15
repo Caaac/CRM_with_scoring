@@ -38,7 +38,6 @@ const pushBack = () => {
 }
 
 watch(route, (to, from) => {
-  console.log(to, from);
   if (to.params.idCompany > 0) {
     store.companyStore().getCompany()
       .then(r => {

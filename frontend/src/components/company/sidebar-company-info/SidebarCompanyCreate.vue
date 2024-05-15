@@ -45,21 +45,12 @@ const createNewCompany = () => {
 }
 
 const alertOfError = (summary = '', detail = '') => {
-  toast.add({
-    severity: 'error',
-    summary: summary,
-    detail: detail,
-    life: 3000
-  })
-}
-
-const alertOfSuccess = (summary = '', detail = '') => {
-  toast.add({
-    severity: 'success',
-    summary: summary,
-    detail: detail,
-    life: 3000
-  })
+    toast.add({
+        severity: 'error',
+        summary: summary,
+        detail: detail,
+        life: 3000
+    })
 }
 
 </script>
@@ -135,8 +126,8 @@ const alertOfSuccess = (summary = '', detail = '') => {
                         <div class="crm-sidebar-info-item-title">Телефон</div>
                         <div class="crm-sidebar-info-item-value">
                             <Skeleton v-if="isLoading" class="mb-2" height="32px" width="244px"></Skeleton>
-                            <InputNumber v-else inputId="withoutgrouping" :useGrouping="false"
-                                class="crm-sidebar-about-input-int" v-model="newCompnay.phone" />
+                            <InputMask id="phone" unmask="true" mask="+9 (999) 999-9999" inputId="withoutgrouping"
+                                :useGrouping="false" class="crm-sidebar-about-input-int" v-model="newCompnay.phone" />
                         </div>
                     </div>
 

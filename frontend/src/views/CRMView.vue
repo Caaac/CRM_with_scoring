@@ -3,10 +3,14 @@ import { onActivated, onMounted, ref } from 'vue'
 import { rootStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { RouterView, useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+
 const store = rootStore()
 const router = useRouter()
+const toast = useToast()
 
-const { stages, list } = storeToRefs(store.crmStore())
+const { stages } = storeToRefs(store.settingsStore())
+const { list } = storeToRefs(store.crmStore())
 const crmStyles = ref({ width: '' })
 
 onMounted(() => {
@@ -28,16 +32,43 @@ const onDragstart = (e, card) => {
 
 const onDrop = (e, stageName) => {
   const card = JSON.parse(e.dataTransfer.getData('card'))
+  const prevSatge = card.stage
+  card.stage = stageName
 
-  if (list.value[stageName].some((crd) => crd.id == card.id)) return false
+  if (prevSatge == stageName) return false
 
-  Object.keys(list.value).forEach((key) => {
-    list.value[key] = list.value[key].filter((el) => el.id != card.id)
+  if (stageName == 'END') card.date_closed = new Date().format('yyyy-mm-dd')
+  else card.date_closed = null
+
+  store.crmStore().updateDeal(card.id, card)
+    .then((result) => {
+      // Из-за реактивности id удаляется и его нужно восстановить
+      card.id = result.data.id
+      if (list.value[stageName].some((crd) => crd.id == card.id)) return false
+      list.value[prevSatge] = list.value[prevSatge].filter((el) => el.id != card.id)
+      if (!list.value[stageName]) list.value[stageName] = []
+      list.value[stageName].push(card)
+    }).catch((err) => {
+      card.stage = prevSatge
+      alertOfError('Стадия задачи не изменена', 'Во время изменения стадии произошла ошибка')
+    });
+}
+
+const cardTitel = (title) => {
+  if (title.length > 33)
+    return title.slice(0, 30) + '...'
+  return title
+}
+
+const totalAmount = (stageName) => list.value[stageName]?.reduce((acc, curr) => acc + curr.loan_amount, 0)
+
+const alertOfError = (summary = '', detail = '') => {
+  toast.add({
+    severity: 'error',
+    summary: summary,
+    detail: detail,
+    life: 3000
   })
-
-  if (!list.value[stageName]) list.value[stageName] = []
-
-  list.value[stageName].push(card)
 }
 
 // Попытки автоматизировать расширение
@@ -57,43 +88,33 @@ const onDrop = (e, stageName) => {
 <template>
   <div class="crm-crm-main-block" ref="mainBlock" :style="crmStyles">
     <div v-for="stage in stages" :key="stage.name" class="crm-crm-stage-block">
-      <div
-        class="crm-crm-stage-title"
-        :style="{ 'background-color': stage.color, color: stage?.textColor }"
-      >
+      <div class="crm-crm-stage-title" :style="{ 'background-color': stage.color, color: stage?.textColor }">
         {{ stage.name }}
       </div>
-      <div
-        class="crm-crm-cards-block"
-        @drop="onDrop($event, stage.name)"
-        @dragover.prevent
-        @dragenter.prevent
-      >
-        <div
-          v-for="card in list[stage.name]"
-          :key="card.id"
-          class="crm-crm-card"
-          draggable="true"
-          @dragstart="onDragstart($event, card)"
-        >
-          <div class="crm-crm-card-wrapper">
-            <div class="crm-crm-card-title" @click="router.push({ path: `/crm/${card.id}/` })">
-              {{ card.TITLE }}
-            </div>
-            <div class="crm-crm-card-price">1000 ₽</div>
-            <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/details/${1}/` })">Михаил</div>
-            <!-- <div class="crm-crm-card-client" @click="router.push({ path: `/company/${1}/` })">ООО "MywebStor"</div> -->
-            <div class="flex items-center justify-between mt-2">
-              <Avatar
-                label="U"
-                class=""
-                shape="circle"
-                style="background-color: #ece9fc; color: #2a1261"
-              />
-              <div><Tag :value="card.STAGE" /></div>
+      <div class="crm-crm-total-amount">
+        <div class="crm-crm-total-amount-wrapper">
+          {{ totalAmount(stage.code) }} ₽
+        </div>
+      </div>
+      <div v-if="list" class="crm-crm-cards-block" @drop="onDrop($event, stage.code)" @dragover.prevent
+        @dragenter.prevent>
+          <div v-for="card in list[stage.code]" :key="card.id" class="crm-crm-card" draggable="true"
+            @dragstart="onDragstart($event, card)">
+            <div class="crm-crm-card-wrapper">
+              <div class="crm-crm-card-title" @click="router.push({ path: `/crm/${card.id}/` })">
+                {{ cardTitel(card.title) }}
+              </div>
+              <div class="crm-crm-card-price">{{ card.loan_amount }} ₽</div>
+              <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/details/${1}/` })">Михаил</div>
+              <!-- <div class="crm-crm-card-client" @click="router.push({ path: `/company/${1}/` })">ООО "MywebStor"</div> -->
+              <div class="flex items-center justify-between mt-2">
+                <Avatar label="U" class="" shape="circle" style="background-color: #ece9fc; color: #2a1261" />
+                <div>
+                  <Tag :value="card.stage" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </div>
@@ -110,11 +131,17 @@ const onDrop = (e, stageName) => {
   display: flex;
 }
 
+.crm-crm-card-wrapper .p-avatar:hover {
+  scale: 1.05;
+}
+
 .crm-crm-stage-block {
-  min-width: 270px;
   width: 100%;
+  /* min-width: 270px; */
+  max-width: 300px;
   height: 100%;
-  min-height: 100%;
+  /* min-height: 100%; */
+  /* overflow-y: scroll; */
   border-radius: 0 16px 16px 0;
 }
 
@@ -123,11 +150,11 @@ const onDrop = (e, stageName) => {
   text-align: center;
   font-size: 16px;
   font-weight: 600;
+  white-space: normal;
 }
 
 .crm-crm-card {
   width: 250px;
-  height: 100%;
   margin: 5px;
   background-color: white;
 }
@@ -141,11 +168,12 @@ const onDrop = (e, stageName) => {
   cursor: pointer;
   font-size: 15px;
   font-weight: bold;
-  color: #3a4963 ;
+  color: #3a4963;
+  white-space: normal;
 }
 
 .crm-crm-card-title:hover {
-  color: #1853b9 ;
+  color: #1853b9;
 }
 
 .crm-crm-card-price {
@@ -161,7 +189,7 @@ const onDrop = (e, stageName) => {
 }
 
 .crm-crm-card-client:hover {
-  text-decoration:underline;
+  text-decoration: underline;
 }
 
 .crm-crm-cards-block {
@@ -169,11 +197,32 @@ const onDrop = (e, stageName) => {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: scroll;
+  margin-bottom: 10px;
+}
+
+.crm-crm-total-amount,
+.crm-crm-cards-block {
   border: 1px dashed rgba(72, 72, 72, 0.581);
   border-top: none;
   border-bottom: none;
-  border-right: none;
+  /* border-right: none; */
+}
+
+.crm-crm-total-amount {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.crm-crm-total-amount-wrapper {
+  margin-top: 5px;
+  margin-bottom: 7px;
+  background-color: rgb(183, 201, 250);
+  width: 80%;
+  text-align: center;
+  border-radius: 16px;
 }
 
 .crm-crm-card-wrapper {

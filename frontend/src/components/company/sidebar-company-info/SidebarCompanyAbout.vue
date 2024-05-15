@@ -83,7 +83,7 @@ watch(isEddit, (n, o) => {
                 <div class="crm-sidebar-info-item">
                     <div class="crm-sidebar-info-item-title">Телефон</div>
                     <div v-if="isEddit" class="crm-sidebar-info-item-value">
-                        <InputNumber inputId="withoutgrouping" :useGrouping="false" class="crm-sidebar-about-input-int"
+                        <InputMask id="phone" unmask="true" mask="+9 (999) 999-9999" inputId="withoutgrouping" :useGrouping="false" class="crm-sidebar-about-input-int"
                             v-model="companyDetail.phone" />
                     </div>
                     <div v-else class="crm-sidebar-info-item-value">{{ companyDetail?.phone }}</div>
@@ -130,8 +130,12 @@ watch(isEddit, (n, o) => {
 
 <style>
 .crm-sidebar-about-input,
+.crm-sidebar-info-item #phone.p-inputtext,
+.crm-sidebar-about-input .p-dropdown-label,
 .crm-sidebar-about-input-int .p-inputtext.p-component.p-inputnumber-input {
   padding: 2px 12px;
+  width: 100%; 
+    border: 0px;
 }
 
 .crm-sidebar-info-item-title {

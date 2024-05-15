@@ -25,7 +25,8 @@ const companyCreate = (event) => {
 
         <DataTable :value="companies" @rowSelect="userSelect" :loading="isLoading" selectionMode="single" dataKey="id"
             :metaKeySelection="false" paginator stripedRows removableSort :rows="10"
-            :rowsPerPageOptions="[10, 20, 50, 100]" tableStyle="width: 100%">
+            :rowsPerPageOptions="[10, 20, 50, 100]" tableStyle="width: 100%"
+            :virtualScrollerOptions="{ lazy: true, onLazyLoad: loadCarsLazy, itemSize: 46, delay: 200, showLoader: true, loading: lazyLoading, numToleratedItems: 10 }">
             <Column field="id" header="ID" style="width: 5%" sortable></Column>
             <Column field="name" header="Название орагнизации" style="width: 13.6%" sortable></Column>
             <Column field="industry" header="Отрасль" style="width: 13.6%" sortable></Column>

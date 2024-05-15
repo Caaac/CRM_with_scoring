@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useCompanyStore = defineStore('company', () => {
   const $axios = inject('$axios')
+  
   const companies = ref({})
   const companyDetail = ref({})
   
