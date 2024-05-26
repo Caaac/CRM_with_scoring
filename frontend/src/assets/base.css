@@ -8,6 +8,8 @@
   --fs-header-laptop: 14px;
   --fs-body-laptop: 15px;
 
+  --lable-color: #adb5bd;
+
   --font-family: "Montserrat", sans-serif !important;
 }
 
@@ -35,6 +37,7 @@ body {
   line-height: 1.6;
   font-size: var(--fs-body-desctop);
   text-rendering: optimizeLegibility;
+  /* color: #3a4963; */
 }
 
 @media (max-width: 1536px) {

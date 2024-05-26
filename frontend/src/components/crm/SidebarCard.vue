@@ -48,7 +48,7 @@ const pushBack = () => {
 
       <StageBar />
 
-      {{ dealDetail }}
+      <!-- {{ dealDetail }} -->
       <div class="card">
         <TabView class="aaa">
           <TabPanel header="Общее">

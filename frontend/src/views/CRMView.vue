@@ -1,5 +1,5 @@
 <script setup>
-import { onActivated, onMounted, ref } from 'vue'
+import { onActivated, computed, onMounted, ref } from 'vue'
 import { rootStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { RouterView, useRouter } from 'vue-router'
@@ -61,6 +61,26 @@ const cardTitel = (title) => {
 }
 
 const totalAmount = (stageName) => list.value[stageName]?.reduce((acc, curr) => acc + curr.loan_amount, 0)
+const getContact = (card) => {
+  // if (card.client) {
+  //   const company = store.companyStore().companies.find(c => c.id == card.company)
+  //   return 1
+  // }
+  return 'Ануфриев Алексей' 
+  return 'Пользователь не найден'
+}
+const getCompany = (card) => {
+  if (card.company) {
+    const company = store.companyStore().companies.find(c => c.id == card.company)
+    return company.full_name
+  }
+  return 'Компания не найдена'
+}
+
+const getAvatarLable = (responsible) => {
+  const resp = store.userStore().managers.find(mg => mg.id == responsible)
+  return resp.name.slice(0, 1) + resp.last_name.slice(0, 1)
+}
 
 const alertOfError = (summary = '', detail = '') => {
   toast.add({
@@ -96,6 +116,11 @@ const alertOfError = (summary = '', detail = '') => {
           {{ totalAmount(stage.code) }} ₽
         </div>
       </div>
+      <div class="crm-crm-create">
+        <div class="crm-crm-create-wrapper">
+          <span class="mdi mdi-plus-circle-outline"></span>
+        </div>
+      </div>
       <div v-if="list" class="crm-crm-cards-block" @drop="onDrop($event, stage.code)" @dragover.prevent
         @dragenter.prevent>
           <div v-for="card in list[stage.code]" :key="card.id" class="crm-crm-card" draggable="true"
@@ -105,13 +130,11 @@ const alertOfError = (summary = '', detail = '') => {
                 {{ cardTitel(card.title) }}
               </div>
               <div class="crm-crm-card-price">{{ card.loan_amount }} ₽</div>
-              <div class="crm-crm-card-client" @click="router.push({ path: `/crm/contact/details/${1}/` })">Михаил</div>
-              <!-- <div class="crm-crm-card-client" @click="router.push({ path: `/company/${1}/` })">ООО "MywebStor"</div> -->
+              <div v-if="card.contant" class="crm-crm-card-client" @click="router.push({ path: `contact/details/${card.contant}/` })">{{ getContact(card) }}</div>
+              <div v-else-if="card.company" class="crm-crm-card-client" @click="router.push({ path: `company/details/${card.company}/` })">{{ getCompany(card) }}</div>
               <div class="flex items-center justify-between mt-2">
-                <Avatar label="U" class="" shape="circle" style="background-color: #ece9fc; color: #2a1261" />
-                <div>
-                  <Tag :value="card.stage" />
-                </div>
+                <Avatar :label="getAvatarLable(card.responsible)" class="" shape="circle" style="background-color: #ece9fc; color: #2a1261; font-size:14px" />
+                <div><Tag :value="card.stage" /></div>
               </div>
             </div>
           </div>
@@ -203,7 +226,8 @@ const alertOfError = (summary = '', detail = '') => {
 }
 
 .crm-crm-total-amount,
-.crm-crm-cards-block {
+.crm-crm-cards-block,
+.crm-crm-create {
   border: 1px dashed rgba(72, 72, 72, 0.581);
   border-top: none;
   border-bottom: none;
@@ -223,6 +247,33 @@ const alertOfError = (summary = '', detail = '') => {
   width: 80%;
   text-align: center;
   border-radius: 16px;
+}
+
+.crm-crm-create {
+  display: none;
+  justify-content: center;
+  transition: display .5s;
+}
+
+.crm-crm-stage-block:hover + .crm-crm-create,
+.crm-crm-total-amount:hover + .crm-crm-create,
+.crm-crm-create:hover  {
+  display: flex;
+}
+
+.crm-crm-create-wrapper {
+  width: 80%;
+  height: 30px;
+  background-color: #c2d2e48e;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: -10px 0 -10px 0;
+}
+
+.crm-crm-create-wrapper span {
+  font-size: 25px;
 }
 
 .crm-crm-card-wrapper {

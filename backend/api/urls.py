@@ -17,5 +17,7 @@ urlpatterns = [
     path('settings/stages/', views.stages),
     path('settings/source/', views.source),
 
+    path('managers/', views.managers_list),
+
     path('test/', views.test),
 ]

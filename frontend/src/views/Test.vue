@@ -57,7 +57,7 @@ const postAxios = () => {
 
     const data = {
         name: "Company ABC",
-        ful_name: "ABC Corporation",
+        full_name: "ABC Corporation",
         representative_name: "John",
         representative_last_name: "Doe",
         address: "123 Main Street, City, Country",

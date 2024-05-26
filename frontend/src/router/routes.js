@@ -1,10 +1,12 @@
+import CRMView from '@/views/CRMView.vue'
 import ContactView from '@/views/ContactView.vue'
 import CompanyView from '@/views/CompanyView.vue'
-import CRMView from '@/views/CRMView.vue'
+import ReportsView from '@/views/ReportsView.vue'
+import UserAccount from '@/views/user/UserAccount.vue'
+import SidebarCard from '@/components/crm/SidebarCard.vue'
+import ReportDetail from '@/components/report/ReportDetail.vue'
 import SidebarContact from '@/components/contact/SidebarContact.vue'
 import SidebarCompany from '@/components/company/SidebarCompany.vue'
-import SidebarCard from '@/components/crm/SidebarCard.vue'
-import UserAccount from '@/views/user/UserAccount.vue'
 
 import Test from '@/views/Test.vue'
 
@@ -26,6 +28,10 @@ const routes = [
       {
         path: 'contact/details/:idContact(\\d+)/',
         component: SidebarContact
+      },
+      {
+        path: 'company/details/:idCompany(\\d+)/',
+        component: SidebarCompany
       }
     ]
   },
@@ -62,6 +68,26 @@ const routes = [
     ]
   },
   {
+    path: '/report/',
+    name: 'report',
+    meta: {
+      title: 'Отчеты',
+      display: true,
+      icon: 'mdi mdi-chart-bar'
+    },
+    component: ReportsView,
+  },
+  {
+    path: '/report/details/:idReport(\\d+)/',
+    name: 'reportDetail',
+    meta: {
+      title: 'Отчет',
+      display: false,
+      icon: 'mdi mdi-chart-bar'
+    },
+    component: ReportDetail,
+  },
+  {
     path: '/user/account/',
     name: 'userAccount',
     meta: {
@@ -75,7 +101,7 @@ const routes = [
     name: 'test',
     meta: {
       title: 'Тестовая страница',
-      display: true
+      display: false
     },
     component: Test,
   }

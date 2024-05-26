@@ -82,7 +82,7 @@ const alertOfError = (summary = '', detail = '') => {
                         <div class="crm-sidebar-info-item-value">
                             <Skeleton v-if="isLoading" class="mb-2" height="32px" width="244px"></Skeleton>
                             <InputText v-else type="text" class="crm-sidebar-about-input"
-                                v-model="newCompnay.ful_name" />
+                                v-model="newCompnay.full_name" />
                         </div>
                     </div>
 

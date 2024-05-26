@@ -50,7 +50,7 @@ watch(route, (to, from) => {
 <template>
   <div>
     <Sidebar v-model:visible="visibleCompanySidebar" @hide="pushBack" class="crm-side-bar"
-      :header="companyDetail?.ful_name || 'Создание новой компании'" position="right">
+      :header="companyDetail?.full_name || 'Создание новой компании'" position="right">
       <Divider class="sidebar-header-divider" />
       <div class="crm-sidebar-about-main">
         <SidebarCompanyCreate v-if="isCreate" />

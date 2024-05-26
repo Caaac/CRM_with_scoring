@@ -40,9 +40,9 @@ watch(isEddit, (n, o) => {
                 <div class="crm-sidebar-info-item">
                     <div class="crm-sidebar-info-item-title">Полное аименование</div>
                     <div v-if="isEddit" class="crm-sidebar-info-item-value">
-                        <InputText type="text" class="crm-sidebar-about-input" v-model="companyDetail.ful_name" />
+                        <InputText type="text" class="crm-sidebar-about-input" v-model="companyDetail.full_name" />
                     </div>
-                    <div v-else class="crm-sidebar-info-item-value">{{ companyDetail?.ful_name }}</div>
+                    <div v-else class="crm-sidebar-info-item-value">{{ companyDetail?.full_name }}</div>
                 </div>
 
                 <div class="crm-sidebar-info-item">
@@ -140,7 +140,7 @@ watch(isEddit, (n, o) => {
 
 .crm-sidebar-info-item-title {
   font-size: 13px;
-  color: #adb5bd;
+  color: var(--lable-color);
 }
 
 .crm-sidebar-info-item-value {

@@ -6,10 +6,23 @@ export const useSettingsStore = defineStore('settings', () => {
   const $axios = inject('$axios')
 
   const isLoading = ref(true)
+  const isAuth = ref(false)
 
   // CRM
   const stages = ref([])
   const source = ref([])
+  const loan_duration = ref([
+    { name: '6 месяцев', month: 6 },
+    { name: '1 год', month: 12 },
+    { name: '1.5 года', month: 18 },
+    { name: '2 года', month: 24 },
+    { name: '2.5 года', month: 30 },
+    { name: '3 года', month: 36 },
+    { name: '3.5 года', month: 42 },
+    { name: '4 года', month: 48 },
+    { name: '4.5 года', month: 54 },
+    { name: '5 лет', month: 60 },
+  ])
 
   const getStages = () => {
     return new Promise((reject, resolve) => {
@@ -39,5 +52,5 @@ export const useSettingsStore = defineStore('settings', () => {
     })
   }
 
-  return { isLoading, stages, getStages, source, getSource }
+  return { isLoading, stages, getStages, source, getSource, loan_duration, isAuth }
 })

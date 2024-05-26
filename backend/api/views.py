@@ -155,6 +155,14 @@ def crm_deal_detail(request, pk):
 #         return JsonResponse(crmDeal_serializer.data) 
 #     return JsonResponse(crmDeal_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET']) 
+def managers_list(request):
+    menegers = Users.objects.all()
+    
+    if request.method == 'GET': 
+        menegers_serializer = UsersSerializer(menegers, many=True) 
+        return JsonResponse(menegers_serializer.data, safe=False)
+
 
 
 def stages(request):
@@ -174,13 +182,14 @@ def source(request):
 
 from django.contrib.auth import authenticate
 def test(request):
-    pass
-    # company = Company.objects.get(id=1)
+    # pass
+    company = Company.objects.get(id=1)
     
-    # if request.method == 'GET': 
-        # company_serializer = CompanySerializer(company) 
+    if request.method == 'GET': 
+        company_serializer = CompanySerializer(company) 
         # return JsonResponse(company_serializer.data)
-    # return HttpResponse('1223')
+        # return JsonResponse(company_serializer.data)
+    # return HttpResponse('1223', company)
 
 
 
