@@ -30,8 +30,11 @@ Migrations
 
 ```
 python manage.py makemigrations
+```
+```
 python manage.py migrate
 ```
+
 Run Server
 
 ```
@@ -49,9 +52,15 @@ python -m venv venv
 ```
 Activate venv
 
+> Windows
 ```
 venv\Scripts\activate
 ```
+> MacOS
+```
+source venv/bin/activate
+```
+
 Deactivate venv
 
 ```
