@@ -43,5 +43,19 @@ export const useCompanyStore = defineStore('company', () => {
     return companies.value.find(el => el.id == id)
   }
 
-  return { companies, getCompany, findCompanyById, updateCompany, companyDetail }
+  const getTemplate = (() => {
+    const tml = companies.value.shift()
+
+    Object.keys(tml).map(key => {
+      // if (key == 'id') delete tml[key]
+      if (key == 'id') tml[key] = 0
+      else if (tml[key] instanceof Array) tml[key] = []
+      else tml[key] = null
+    })
+
+    return tml
+
+  })
+
+  return { companies, getCompany, findCompanyById, updateCompany, companyDetail, getTemplate }
 })

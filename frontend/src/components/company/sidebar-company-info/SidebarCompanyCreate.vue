@@ -17,6 +17,7 @@ const { isLoading } = storeToRefs(store.settingsStore())
 
 onMounted(() => {
     const tml = store.companyStore().companies.shift()
+
     Object.keys(tml).map(key => {
         if (key == 'id') delete tml[key]
         else if (tml[key] instanceof Array) tml[key] = []

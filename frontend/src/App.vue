@@ -75,7 +75,7 @@ onMounted(() => {
 
 <style>
 main {
-  width: 100%;
+  width: 85vw;
   padding: 0 40px 0 30px;
   background-color: #f2f4f6;
 }

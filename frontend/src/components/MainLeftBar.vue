@@ -71,7 +71,7 @@ header {
 }
 
 .crm-header-wrapper {
-  width: 250px;
+  width: 15vw;
   position: sticky;
   top: 0;
   height: 100vh;
