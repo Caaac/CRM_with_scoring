@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS p_user_field_enum;
+DROP TABLE IF EXISTS p_user_field;
+DROP TABLE IF EXISTS p_user;
+DROP TABLE IF EXISTS p_option;

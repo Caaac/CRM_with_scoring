@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import datetime
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,9 +40,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
-    'api'
+    'api',
+    'crm',
+    'main',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # Аутентификация по токену
+    ],
+     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -137,12 +151,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-
 # Logs
 # https://docs.djangoproject.com/en/5.0/topics/logging/
 
-import os
-import datetime
 # from pythonjsonlogger import jsonlogger
 
 LOGGING = {
@@ -162,5 +173,10 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+    },
+    'django.db.backends': {
+        'level': 'DEBUG',
+        'handlers': ['console'],
+        'propagate': False,
     },
 }

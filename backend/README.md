@@ -35,6 +35,11 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
+Get ORM
+```
+python manage.py inspectdb > models.py
+```
+
 Run Server
 
 ```
