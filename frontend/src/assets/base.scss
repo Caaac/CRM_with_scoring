@@ -22,9 +22,17 @@
 } */
 
 :root {
+  --margine-bottom: 4px;
+  --margine-bottom-1: 15px;
+  --link-hover: red;
+
   /* Header */
   --header-width: 240px;
   --header-width-collapsed: 80px;
+  --header-item-min-width: 80px;
+  --header-item-bg-hover: #fbfcfd;
+  --header-title-color: #2c3e50;
+  --header-title-color-hover: #304860;
 
 
   /* Theme */
@@ -32,6 +40,8 @@
   --theme-c-white-bg-frame: #ffffff;
   
   --theme-c-indigo: #2c3e50;
+  --theme-c-white-gray: #a3a9b1;
+  --theme-c-gray: #535c6a;
 
   --theme-c-text-light-1: var(--theme-c-indigo);
   --theme-c-text-light-2: rgb(60, 60, 60);
@@ -40,6 +50,17 @@
   --icon-size-1: 18px;
   --icon-size-2: 25px;
   --icon-size-3: 30px;
+
+  /* Kanban */
+  --kanban-column-width: 250px;
+
+  /* KanbanCard */
+  --kanban-card-gap: 20px;
+  --card-title-color: #2c3e50;
+  --card-title-color-hover: #304860;
+
+  /* ModuleMenu */
+  --module-menu-height: 50px;
 
 
   --theme-c-divider-light-1: rgba(60, 60, 60, 0.29);
@@ -114,4 +135,25 @@ body {
 
 svg {
   fill: var(--color-text)
+}
+
+
+.mb-1 {
+  margin-bottom: var(--margine-bottom-1);
+}
+
+.mb-2 {
+  margin-bottom: calc(var(--margine-bottom-1) * 1.5);
+}
+
+.mb-3 {
+  margin-bottom: calc(var(--margine-bottom-1) * 2);
+}
+
+.mb-4 {
+  margin-bottom: calc(var(--margine-bottom-1) * 2.5);
+}
+
+.mb-5 {
+  margin-bottom: calc(var(--margine-bottom-1) * 3);
 }

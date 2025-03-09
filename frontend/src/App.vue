@@ -34,7 +34,8 @@ const store = rootStore()
 
 #pl-container {
   width: calc(100% - var(--header-width));
-  height: 200vh;
+  // height: 200vh;
+  height: 100%;
   padding: 10px 30px 0 20px
 }
 

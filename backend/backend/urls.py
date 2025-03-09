@@ -21,7 +21,7 @@ from . import views, auth
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('api/v1/', include('api.urls')),
-    path('api/v1/crm/', include('crm.urls')),
+    path('api/v1/crm/', include('modules.crm.urls')),
     
     re_path(r'^(?P<mode>install|uninstall)/(?P<module>[a-z]+)/?$', views.db_control),
     

@@ -39,6 +39,7 @@ const store = rootStore()
   width: 100%;
   height: 40px;
   display: flex;
+  margin-bottom: 15px;
 
   .pl-top-container-wrapper {
     display: flex;

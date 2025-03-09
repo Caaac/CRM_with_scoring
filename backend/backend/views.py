@@ -9,7 +9,7 @@ def db_control(request, mode, module):
         return HttpResponse(f"Module '{module}' does not exist", 500)
 
     db_type = 'mysql'
-    path_tmpl = f'{module}/install/db/sql/{db_type}/'
+    path_tmpl = f'{module}/{mode}/db/sql/{db_type}/'
     sql_file_path = os.path.join(
         os.getcwdb().decode('utf-8'), path_tmpl, f'{mode}.sql')
 

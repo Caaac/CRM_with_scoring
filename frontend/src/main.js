@@ -7,8 +7,10 @@ import Aura from '@primeuix/themes/aura';
 
 import App from './App.vue'
 import router from './router'
+
 import Axios from '@/api/axios'
 import {RestService} from '@/api/rest'
+import '@/mixins/index'
 
 window.Rest = new RestService()
 
@@ -26,4 +28,3 @@ app.use(PrimeVue, {
 });
 app.provide('$axios', Axios)
 app.mount('#app')
-

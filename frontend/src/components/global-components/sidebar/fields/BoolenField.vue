@@ -1,0 +1,64 @@
+<script setup>
+import Checkbox from 'primevue/checkbox';
+
+const props = defineProps({
+  changeMode: {
+    type: Boolean,
+    default: false,
+  },
+  fieldTitle: {
+    type: String,
+    required: true,
+  },
+  binary: Boolean,
+  trueValue: {
+    type: String,
+    default: '',
+  },
+  falseValue: {
+    type: [String, Number, Boolean],
+    default: '',
+  },
+});
+
+const model = defineModel({
+  type: String,
+  required: true,
+});
+</script>
+
+<template>
+  <div class="string-field custom-field">
+    <div class="field-container">
+      <div class="field-title">{{ props.fieldTitle }}</div>
+      <div class="field-value">
+        <template v-if="!props.changeMode">
+          {{ model ? 'Да' : 'Нет' }}
+        </template>
+        <template v-else>
+          <Checkbox
+            v-model="model"
+            :binary="props.binary"
+            :trueValue="props.trueValue"
+            :falseValue="props.falseValue"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss">
+.string-field {
+  .field-container {
+    display: flex;
+    flex-direction: column;
+
+    .field-title {
+      font-size: 12px;
+      color: var(--theme-c-white-gray);
+      font-weight: 400;
+    }
+  }
+}
+</style>
