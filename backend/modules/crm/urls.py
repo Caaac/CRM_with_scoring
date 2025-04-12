@@ -1,18 +1,26 @@
 from django.urls import path, re_path
 from . import views
-from .views import PageInit, Deal
+from .views import PageInit, Deal, Settings
 
 urlpatterns = [
     # Rest Methods
     path('status/', views.statuses),
     
     # Deal
-    # path('deal/', Deal.deal),
     re_path(r'^deal/?$', Deal.deal), # With settings of UF
     re_path(r'^detail/deal/?$', Deal.deal_detail), # With settings of UF
     
     # Init page
     re_path(r'^deal/(?P<mode>kanban|list)/?$', PageInit.crmDealInit),
+
+    # Settings
+    ## User-Field
+    re_path(r'^settings/user-field/?$', Settings.user_field_list),
+    re_path(r'^settings/user-field-detail/?$', Settings.user_field_detail),
+
+
+
+
     
     
     # re_path(r'^company/(?P<pk>[0-9]+)$', views.company_detail),

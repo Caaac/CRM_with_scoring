@@ -71,7 +71,7 @@ const finalStageStyle = computed(() => {
 
 const saveDeal = () => {
   // TODO: check mandatory fields
-  store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value , false, false,)
+  store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value , false, true)
 }
 </script>
 
@@ -135,6 +135,7 @@ const saveDeal = () => {
             <div class="field-wrapper">
               <template v-for="field in deal_detail.uf_list">
                 <template v-if="field.user_type_id == 'string'">
+                  <!-- {{ field.values }} -->
                   <StringField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
                     :key="field.id" :data-field-name="field.field_name" />
                 </template>
@@ -146,7 +147,7 @@ const saveDeal = () => {
       <div class="deal-timeline"></div>
     </div>
 
-    <!-- <pre>{{ deal_detail }}</pre> -->
+    <pre>{{ deal_detail }}</pre>
   </Sidebar>
 </template>
 
@@ -165,6 +166,7 @@ const saveDeal = () => {
       width: auto;
       border: 1px solid rgb(214, 214, 214);
       border-radius: 2px 26px 26px 2px;
+      cursor: pointer;
 
       .item-title {
         padding: 5px 20px 5px 10px;

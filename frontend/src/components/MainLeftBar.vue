@@ -11,7 +11,7 @@ const store = rootStore();
   <header>
     <div class="logo-container">
       <Image
-        v-if="!store.settings().menuCollapsed"
+        v-if="!store.menuCollapsed"
         src="/src/assets/images/HeaderLogo.PNG"
         alt="Image"
         imageClass="logo"

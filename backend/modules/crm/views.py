@@ -1,11 +1,14 @@
 import os
 import json
+import random
+import string
 
 from accessify import protected, private
 
 from django.shortcuts import render
 from django.db import connection
 from django.http import HttpResponse, JsonResponse
+from django.views import View
 
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
@@ -54,7 +57,8 @@ class Deal:
                 return JsonResponse({'result': False, 'message': 'Data not found!'}, status=status.HTTP_400_BAD_REQUEST)
 
             deal = CrmDeal.objects.get(id=deal_data['id'])
-            deal_serializer = CrmDealSerializer(deal, data=deal_data['data'], partial=True)
+            deal_serializer = CrmDealSerializer(
+                deal, data=deal_data['data'], partial=True)
 
             if deal_serializer.is_valid():
                 deal_serializer.save()
@@ -75,23 +79,60 @@ class Deal:
             deal_data = CrmDealSerializer(deal).data
 
             # Для конкретного поля сделки получаем характеристики поля
-            deal_fields_value = UtmCrmDeal.objects.all().prefetch_related('field').filter(deal_id=pk)
+            # deal_fields_value = UtmCrmDeal.objects.all().prefetch_related('field').filter(deal_id=pk)
+            # deal_fields_value_serializer = UtmCrmDealSerializer(deal_fields_value, many=True)
+
+            # deal_fields = {}
+            # for user_field in deal_fields_value_serializer.data:
+            #     if (user_field['field']['id'] not in deal_fields):
+            #         deal_fields[user_field['field']
+            #             ['id']] = user_field['field']
+            #         deal_fields[user_field['field']['id']]['values'] = []
+
+            #     value = {**user_field}
+            #     value.pop('field')
+
+            #     deal_fields[user_field['field']['id']]['values'].append(value)
+
+            # deal_data['uf_list'] = list(deal_fields.values())
+
+            user_fields = UserField.objects.filter(entity_id='DEAL').all()
+            user_fields_serializer = UserFieldSerializer(
+                user_fields, many=True)
+
+            deal_fields_value = UtmCrmDeal.objects.filter(deal_id=pk).all()
             deal_fields_value_serializer = UtmCrmDealSerializer(
                 deal_fields_value, many=True)
 
             deal_fields = {}
-            for user_field in deal_fields_value_serializer.data:
-                if (user_field['field']['id'] not in deal_fields):
-                    deal_fields[user_field['field']
-                        ['id']] = user_field['field']
-                    deal_fields[user_field['field']['id']]['values'] = []
 
-                value = {**user_field}
-                value.pop('field')
+            for uf in user_fields_serializer.data:
+                uf['values'] = []
+                deal_fields[uf['id']] = uf
 
-                deal_fields[user_field['field']['id']]['values'].append(value)
+            for uf_value in deal_fields_value_serializer.data:
+                # uf_value['field_id'] = uf_value['field']['id']
+                # del uf_value['field']
+                deal_fields[uf_value['field_id']]['values'].append(uf_value)
+                # deal_fields[uf_value['field']['id']]['values'].append(uf_value)
+
+            for uf in deal_fields.values():
+                if (not uf['values']):
+                    deal_fields[uf['id']]['values'] = [
+                        {
+                            "id": 0,
+                            "deal_id": pk,
+                            "field_id": uf['id'],
+                            "value": None,
+                            "value_int": None,
+                            "value_double": None,
+                            "value_datetime": None,
+                        }
+                    ]
 
             deal_data['uf_list'] = list(deal_fields.values())
+
+            # print(deal_fields_value_serializer.data)
 
             # commit 2025-03-06
             # Получаем для конкретного поля все значения
@@ -101,7 +142,7 @@ class Deal:
 
             return JsonResponse(deal_data, safe=False)
 
-        if (not request.data.get('id', 0)): 
+        if (not request.data.get('id', 0)):
             return JsonResponse({'result': False, 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
 
         if (not request.data.get('data', None)):
@@ -113,18 +154,21 @@ class Deal:
             return Response({'error': 'Сделка не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
         if (request.method == 'PUT'):
-            deal_serializer = CrmDealSerializer(deal, data=request.data.get('data'), partial=True)
+            deal_serializer = CrmDealSerializer(
+                deal, data=request.data.get('data'), partial=True)
             if deal_serializer.is_valid():
-                deal_serializer.save()  # Сохраняем основную сущность
-                
+                deal_serializer.save()
+
                 uset_field = request.data.get('data').get('uf_list', [])
                 for field in uset_field:
                     for utm_value in field.get('values', []):
-                        print(utm_value)
+                        # print(utm_value)
                         utm_id = utm_value.get('id')
                         if utm_id:
                             try:
-                                utm_crm_deal = UtmCrmDeal.objects.get(id=utm_id)
+                                utm_crm_deal = UtmCrmDeal.objects.get(
+                                    id=utm_id
+                                )
                                 print(utm_crm_deal, end='\n')
                                 for attr, value in utm_value.items():
                                     if attr != 'deal':
@@ -134,10 +178,11 @@ class Deal:
                             except UtmCrmDeal.DoesNotExist:
                                 pass
                         else:
-                            pass
-                            # # Если ID отсутствует, создаем новую запись TODO
-                            # utm_crm_deal = UtmCrmDeal.objects.create(deal=crm_deal, **utm)
-                            # utm_crm_deal.save()
+                            field_obj = UserField.objects.get(id=field['id'])
+                            del utm_value['id']
+                            utm_serializer = UtmCrmDeal(
+                                deal=deal, field=field_obj, **utm_value)
+                            utm_serializer.save()
 
                 return Response(deal_serializer.data, status=status.HTTP_200_OK)
 
@@ -146,10 +191,8 @@ class Deal:
         if request.method == 'DELETE':
             deal.delete()
             return JsonResponse({'result': True, 'message': 'Deal was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-        
-    
-        return JsonResponse([], safe=False)
 
+        return JsonResponse([], safe=False)
 
 
 class PageInit:
@@ -164,7 +207,8 @@ class PageInit:
         status = CrmStatus.objects.all()
         status_serializer = CrmStatusSerializer(status, many=True)
 
-        unique_status = [status['status_id'] for status in status_serializer.data]
+        unique_status = [status['status_id']
+                         for status in status_serializer.data]
 
         response = {
             'entity': 'deal',
@@ -173,15 +217,16 @@ class PageInit:
         }
 
         if (mode == 'kanban'):
-            response['stage_data'] = PageInit.prepareKanban(status_serializer.data, deal_serializer.data)
+            response['stage_data'] = PageInit.prepareKanban(
+                status_serializer.data, deal_serializer.data)
 
         return JsonResponse(response, safe=False)
         # return HttpResponse(str(unique_status), 200)
-        
+
     def prepareKanban(status_list, entity_list):
         unique_status = [status['status_id'] for status in status_list]
         stage_data = {}
-        
+
         for status_id in unique_status:
             stage_data[status_id] = {
                 'status_data': {},
@@ -197,6 +242,137 @@ class PageInit:
                 if deal['stage_id'] == status_id:
                     stage_data[status_id]['data'].append(deal)
 
-        stage_data = dict(sorted(stage_data.items(), key=lambda x: x[1]['status_data']['sort']))
+        stage_data = dict(
+            sorted(stage_data.items(), key=lambda x: x[1]['status_data']['sort']))
 
         return stage_data
+
+
+class Settings:
+    def __init__(self):
+        pass
+
+    @api_view(['GET'])
+    def user_field_list(request):
+        user_fields = UserField.objects.all()
+        user_fields_serializer = UserFieldSerializer(user_fields, many=True)
+        return JsonResponse(user_fields_serializer.data, safe=False)
+
+        # user_fields = UserField.objects.prefetch_related('utm_crm_deals').all()
+        # serializer = UserFieldSerializer(user_fields, many=True)
+        # return Response(serializer.data)
+
+    @api_view(['GET', 'PUT', 'POST', 'DELETE'])
+    def user_field_detail(request):
+        if request.method == 'GET':
+            # Settings.user_field_detail_GET(request)
+            try:
+                if id := request.GET.get('field_name'):
+                    user_fields = UserField.objects.get(field_name=id)
+                elif id := request.GET.get('id'):
+                    user_fields = UserField.objects.get(id=id)
+                else:
+                    return JsonResponse({'result': False, 'message': 'Field not found!'}, status=status.HTTP_400_BAD_REQUEST)
+
+                user_fields_serializer = UserFieldSerializer(
+                    user_fields, many=False)
+                return JsonResponse(user_fields_serializer.data, safe=False)
+            except UserField.DoesNotExist:
+                return JsonResponse({'result': False, 'message': 'Field not found!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.method == 'PUT':
+            data = JSONParser().parse(request)
+
+            if ('id' not in data.keys()):
+                return JsonResponse({'result': False, 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user_fields_serializer = UserFieldSerializer(
+                UserField.objects.get(id=data['id']), data=data, partial=True
+            )
+
+            if user_fields_serializer.is_valid():
+                user_fields_serializer.save()
+                return JsonResponse(user_fields_serializer.data, safe=False, status=status.HTTP_200_OK)
+            return JsonResponse(user_fields_serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.method == 'POST':
+            data = JSONParser().parse(request)
+            field_name = 'UF_'
+            scope = {
+                'CRM': ['DEAL'],
+            }
+
+            for key, value in scope.items():
+                if data.get('entity_id') in value:
+                    field_name += key + '_'
+
+            while True:
+                test_name = field_name + Settings.uf_index_generator().__next__()
+                exists = UserField.objects.filter(
+                    field_name=test_name).exists()
+                if (not exists):
+                    field_name = test_name
+                    break
+
+            data['field_name'] = field_name
+            user_fields_serializer = UserFieldSerializer(data=data)
+
+            if user_fields_serializer.is_valid():
+                user_fields_serializer.save()
+                return JsonResponse(
+                    {
+                        'status': 'success',
+                        'data': user_fields_serializer.data,
+                        'error': None,
+                    },
+                    safe=False,
+                    status=status.HTTP_201_CREATED
+                )
+            return JsonResponse(
+                {
+                    'status': 'error',
+                    'data': None,
+                    'error': user_fields_serializer.errors,
+                },
+                safe=False,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if request.method == 'DELETE':
+            data = JSONParser().parse(request)
+
+            if ('id' not in data.keys()):
+                return JsonResponse({'status': 'error', 'data': [], 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user_filed = UserField.objects.get(id=data['id'])
+            user_filed.delete()
+            
+            return JsonResponse({'status': 'success', 'data': [], 'message': []}, status=status.HTTP_204_NO_CONTENT)
+
+        # if request.method == 'DELETE':
+        #     user_fields = UserField.objects.get(id=request.GET.get('id'))
+        #     user_fields.delete()
+        #     return JsonResponse({'result': True, 'message': 'Field was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+
+    def user_field_detail_GET(request):
+        try:
+            if id := request.GET.get('field_name'):
+                user_fields = UserField.objects.get(field_name=id)
+            elif id := request.GET.get('id'):
+                user_fields = UserField.objects.get(id=id)
+            else:
+                return JsonResponse({'error': 'Поле не найдено'}, status=status.HTTP_404_NOT_FOUND)
+
+            user_fields_serializer = UserFieldSerializer(
+                user_fields, many=False)
+            return JsonResponse(user_fields_serializer.data, safe=False)
+        except UserField.DoesNotExist:
+            return JsonResponse({'error': 'Поле не найдено'}, status=status.HTTP_404_NOT_FOUND)
+
+    @staticmethod
+    def uf_index_generator():
+        while True:
+            length = random.randint(10, 13)
+            number = ''.join(random.choice(string.digits)
+                             for _ in range(length))
+            yield str(int(number))

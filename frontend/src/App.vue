@@ -1,22 +1,25 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+/* PrimeVue components */
+import Toast from "primevue/toast";
 /* Custom components */
-import Header from '@/components/Header.vue'
+import Header from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue';
 /* Store */
 import { rootStore } from './stores';
+import { RouterLink, RouterView } from 'vue-router'
 
 const store = rootStore()
 
 </script>
 
 <template>
-  <div id="pl-window" :class="{'left-manu-collapsed': store.settings().menuCollapsed}">
+  <div id="pl-window" :class="{ 'left-manu-collapsed': store.menuCollapsed }">
     <Header />
     <div id="pl-container">
       <MainTopBar />
       <RouterView />
     </div>
+    <Toast />
   </div>
 </template>
 
@@ -36,7 +39,8 @@ const store = rootStore()
   width: calc(100% - var(--header-width));
   // height: 200vh;
   height: 100%;
-  padding: 10px 30px 0 20px
+  padding: 10px 30px 0 20px;
+  // transition: width 0.5s cubic-bezier(0, 0.42, 0, 0);
 }
 
 #pl-window.left-manu-collapsed #pl-container {
@@ -46,5 +50,4 @@ const store = rootStore()
 #pl-window.left-manu-collapsed header {
   width: var(--header-width-collapsed);
 }
-
 </style>

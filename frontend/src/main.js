@@ -1,9 +1,12 @@
-import './assets/main.scss'
+import '@/assets/main.scss'
+import 'primeicons/primeicons.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
+import ConfirmationService from 'primevue/confirmationservice';
 
 import App from './App.vue'
 import router from './router'
@@ -26,5 +29,6 @@ app.use(PrimeVue, {
     }
   }
 });
+app.use(ConfirmationService);
 app.provide('$axios', Axios)
 app.mount('#app')

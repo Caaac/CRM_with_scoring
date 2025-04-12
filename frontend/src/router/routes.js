@@ -37,6 +37,30 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/settings/",
+    name: "settings",
+    meta: {
+      title: "CRM",
+      display: true,
+      icon: "mdi mdi-application-edit-outline",
+    },
+    component: () => import("@/views/settings/SettingsView.vue"),
+    children: [
+      {
+        path: "user-field/:entity/",
+        name: "uf-deal",
+        component: () => import("@/components/settings/UserField.vue"),
+      },
+      {
+        path: "user-field/:entity/:field_name/",
+        name: "uf-deal-detail",
+        component: () => import("@/components/settings/UserFieldDetail.vue"),
+      },
+    ],
+  },
+
+
 ];
 
 export default routes;

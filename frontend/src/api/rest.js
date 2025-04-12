@@ -1,14 +1,21 @@
 import instance from "@/api/axios";
-import axios from 'axios';
+import axios from "axios";
 
 class RestService {
   constructor() {
     this.API_BASE_PATH = "/api/v1/";
     this.relation = {
+      /**
+       * Status
+       */
       "crm.status.get": {
         path: this.API_BASE_PATH + "crm/status/",
         method: "GET",
       },
+
+      /**
+       * Deal
+       */
       "crm.deal.get": {
         path: this.API_BASE_PATH + "crm/deal/",
         method: "GET",
@@ -32,6 +39,31 @@ class RestService {
       "crm.deal.init.list": {
         path: this.API_BASE_PATH + "crm/deal/list/",
         method: "GET",
+      },
+
+      /**
+       * Settings
+       * -- User Fields
+       */
+      "crm.userField.list": {
+        path: this.API_BASE_PATH + "crm/settings/user-field/",
+        method: "GET",
+      },
+      "crm.userField.get": {
+        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
+        method: "GET",
+      },
+      "crm.userField.update": {
+        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
+        method: "PUT",
+      },
+      "crm.userField.add": {
+        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
+        method: "POST",
+      },
+      "crm.userField.delete": {
+        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
+        method: "DELETE",
       },
     };
   }
@@ -59,22 +91,29 @@ class RestService {
     const keys = Object.keys(commands);
 
     keys.forEach((key) => {
-      methods.push(this.getInstanse(this.relation[commands[key][0]], commands[key][1]));
+      methods.push(
+        this.getInstanse(this.relation[commands[key][0]], commands[key][1])
+      );
     });
 
     return new Promise(async (resolve, reject) => {
-      axios.all(methods)
-        .then(axios.spread((...responses) => {
-          const result = {};
+      axios
+        .all(methods)
+        .then(
+          axios.spread((...responses) => {
+            const result = {};
 
-          responses.forEach((response, index) => {
-            result[keys[index]] = response;
+            responses.forEach((response, index) => {
+              result[keys[index]] = response;
+            });
+
+            resolve(callBack(result));
           })
-
-          resolve(callBack(result))
-        }))
-        .catch(e => { reject(e) })
-    })
+        )
+        .catch((e) => {
+          reject(e);
+        });
+    });
   }
 
   async runQuery(serverData, params) {
@@ -89,7 +128,7 @@ class RestService {
     } else if (serverData.method == "PUT") {
       return instance.put(serverData.path, params);
     } else if (serverData.method == "DELETE") {
-      return instance.delete(serverData.path, params);
+      return instance.delete(serverData.path, { data: params });
     }
   }
 }

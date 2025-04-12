@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { userFieldStore } from './user-field.js'
 
 export const settingsStore = defineStore('settings', () => {
 
-  const menuCollapsed = ref(false);
+  const userField = () => userFieldStore();
 
-  return {menuCollapsed}
+  return {userField}
 })
