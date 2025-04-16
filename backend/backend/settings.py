@@ -97,14 +97,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'crm-sistem',
         'USER': 'root',
         'PASSWORD': 'qwerty1309',
-        'HOST': '127.0.0.1',
-        'PORT': '3306 ',
+        # 'HOST': '127.0.0.1', # from OS
+        'HOST': 'db',  # from docker
+        'PORT': '3306',
         # "COLLATION": "utf8mb3_bin",
         # "TEST": {
         #     "COLLATION": "utf8mb3_bin",

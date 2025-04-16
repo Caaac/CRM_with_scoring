@@ -1,8 +1,12 @@
 <script setup>
 /* PrimeVue components */
-import { rootStore } from "@/stores";
+import Tab from 'primevue/tab';
+import Tabs from 'primevue/tabs';
 import Sidebar from "primevue/sidebar";
+import TabList from 'primevue/tablist';
 import Skeleton from "primevue/skeleton";
+import TabPanel from 'primevue/tabpanel';
+import TabPanels from 'primevue/tabpanels';
 /* Custom components */
 import FieldsCard from "@/components/global-components/sidebar/FieldsCard.vue";
 import StringField from "@/components/global-components/sidebar/fields/StringField.vue";
@@ -14,6 +18,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 /* Stores */
 import { storeToRefs } from "pinia";
+import { rootStore } from "@/stores";
 
 const route = useRoute();
 const router = useRouter();
@@ -71,7 +76,7 @@ const finalStageStyle = computed(() => {
 
 const saveDeal = () => {
   // TODO: check mandatory fields
-  store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value , false, true)
+  store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value, false, true)
 }
 </script>
 
@@ -106,6 +111,39 @@ const saveDeal = () => {
     </div>
 
     <div class="container">
+      <!-- <Tabs value="0">
+        <TabList>
+          <Tab value="0">Header I</Tab>
+          <Tab value="1">Header II</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel value="0">
+            <p class="m-0">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+              dolore
+              magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+              commodo
+              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+              pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
+              id
+              est laborum.
+            </p>
+          </TabPanel>
+          <TabPanel value="1">
+            <p class="m-0">
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
+              rem
+              aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+              explicabo.
+              Nemo enim
+              ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos
+              qui
+              ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+            </p>
+          </TabPanel>
+        </TabPanels>
+      </Tabs> -->
+
       <div class="deal-field">
         <FieldsCard @save="saveDeal" class="mb-1">
           <template #header>Общая</template>
@@ -135,15 +173,22 @@ const saveDeal = () => {
             <div class="field-wrapper">
               <template v-for="field in deal_detail.uf_list">
                 <template v-if="field.user_type_id == 'string'">
-                  <!-- {{ field.values }} -->
                   <StringField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
                     :key="field.id" :data-field-name="field.field_name" />
                 </template>
+
+                <template v-if="field.user_type_id == 'boolean'">
+                  <BoolenField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
+                    :key="field.id" :binary="true" :trueValue="1" :falseValue="0" :data-field-name="field.field_name" />
+                </template>
+
+                <!-- TODO Добавить оставшиеся поля -->
               </template>
             </div>
           </template>
         </FieldsCard>
       </div>
+
       <div class="deal-timeline"></div>
     </div>
 

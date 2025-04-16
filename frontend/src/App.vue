@@ -6,7 +6,7 @@ import Header from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue';
 /* Store */
 import { rootStore } from './stores';
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 
 const store = rootStore()
 

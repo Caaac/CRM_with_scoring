@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --bind-address=0.0.0.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/mysql:/var/lib/mysql
+      - ./database/dump/mysql/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_DATABASE: crm-sistem
+      MYSQL_USER: dev_user
+      MYSQL_PASSWORD: qwerty1309
+      MYSQL_ROOT_PASSWORD: qwerty1309
+
+  backend:
+    depends_on:
+      - db
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/:/usr/src/app
+    command: sh start.sh
+    # command: python manage.py runserver
+
+  frontend:
+    depends_on:
+      - db
+      - backend
+    build:
+      context: ./frontend/
+      dockerfile: dev.Dockerfile
+    ports:
+      - "5173:5173"
+    command: [ "npm", "run", "dev", "--", "--host", "0.0.0.0" ]
+    volumes:
+      - ./frontend/:/app
+      - /app/node_modules

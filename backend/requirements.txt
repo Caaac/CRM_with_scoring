@@ -1,9 +1,10 @@
 accessify==0.3.1
-# altgraph @ file:///AppleInternal/Library/BuildRoots/2c89a47b-9dd5-11ef-938f-6e654a286000/Library/Caches/com.apple.xbs/Sources/python3/altgraph-0.17.2-py2.py3-none-any.whl
 appnope==0.1.4
 asgiref==3.8.1
 asttokens==2.4.1
+cffi==1.17.1
 comm==0.2.2
+cryptography==44.0.2
 debugpy==1.8.5
 decorator==5.1.1
 Django==4.2.20
@@ -27,11 +28,12 @@ prompt_toolkit==3.0.47
 psutil==6.0.0
 ptyprocess==0.7.0
 pure_eval==0.2.3
+pycparser==2.22
 Pygments==2.18.0
 PyMySQL==1.1.1
 python-dateutil==2.9.0.post0
 pyzmq==26.1.0
-# six @ file:///AppleInternal/Library/BuildRoots/2c89a47b-9dd5-11ef-938f-6e654a286000/Library/Caches/com.apple.xbs/Sources/python3/six-1.15.0-py2.py3-none-any.whl
+six==1.17.0
 sqlparse==0.5.3
 stack-data==0.6.3
 tornado==6.4.1

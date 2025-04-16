@@ -1,5 +1,3 @@
-import DealView from "@/views/crm/DealView.vue";
-import DealDetail from "@/components/crm/deal/DealDetail.vue";
 
 const routes = [
   {
@@ -15,6 +13,7 @@ const routes = [
     meta: {
       title: "CRM",
       display: true,
+      sort: 100,
       icon: "mdi mdi-application-edit-outline",
     },
     redirect: (to) => ({ path: "/crm/deal/kanban/" }),
@@ -27,23 +26,63 @@ const routes = [
       },
       {
         path: "deal/kanban/",
-        component: DealView,
+        component: () => import("@/views/crm/DealView.vue"),
         children: [
           {
             path: "/crm/deal/details/:idDeal(\\d+)/",
-            component: DealDetail,
+            component: () => import("@/components/crm/deal/DealDetail.vue"),
+          },
+        ],
+      },
+      {
+        path: "contact/",
+        name: "contact",
+        meta: {
+          title: "Контакты",
+          display: true,
+          sort: 200,
+          icon: "mdi mdi-application-edit-outline",
+        },
+        redirect: (to) => ({ path: "/crm/contact/list/" }),
+        children: [
+          {
+            path: "list/",
+            name: "contact-list",
+            // component: ContactView,
+            component: () => import("@/views/crm/ContactView.vue"),
+            children: [
+              // {
+              //   path: "/crm/contact/details/:idContact(\\d+)/",
+              //   component: ContactDetail,
+              // },
+            ]
           },
         ],
       },
     ],
   },
+  // {
+  //   path: '/contact/',
+  //   name: 'contact',
+  //   meta: {
+  //     title: 'Контакты',
+  //     display: true,
+  //     icon: "mdi mdi-application-edit-outline",
+  //   },
+  //   redirect: (to) => ({ path: "//deal/kanban/" }),
+  //   children: [
+  //     {
+  //       path: "list/",
+  //     }
+  //   ]
+
+  //   // component: () => import("@/views/crm/ContactView.vue"),
+  // },
   {
     path: "/settings/",
     name: "settings",
     meta: {
-      title: "CRM",
-      display: true,
-      icon: "mdi mdi-application-edit-outline",
+      display: false,
     },
     component: () => import("@/views/settings/SettingsView.vue"),
     children: [
@@ -59,8 +98,6 @@ const routes = [
       },
     ],
   },
-
-
 ];
 
 export default routes;
