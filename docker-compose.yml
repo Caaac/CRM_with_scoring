@@ -1,5 +1,7 @@
 version: '3'
 
+name: 'crm'
+
 services:
   db:
     image: mysql:8.0
