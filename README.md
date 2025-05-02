@@ -15,13 +15,14 @@
 docker-compose up
 ```
 
-
 Для запуска контейтера с фронтом
 
 ```sh
-cd frontend/
+cd frontend/ && docker run -v ${PWD}:/app -v /app/node_modules -p 5173:5173 --rm crm-frontend
 ```
 
+MysqlDump
+
 ```sh
-docker run -v ${PWD}:/app -v /app/node_modules -p 5173:5173 --rm vue-test
+mysqldump -u root -h 127.0.0.1 -P 3306 -p crm-sistem > dump.sql
 ```
