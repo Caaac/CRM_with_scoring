@@ -4,6 +4,7 @@ import Toast from "primevue/toast";
 /* Custom components */
 import Header from '@/components/MainLeftBar.vue'
 import MainTopBar from '@/components/MainTopBar.vue';
+import Login from '@/components/auth/Login.vue';
 /* Store */
 import { rootStore } from './stores';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
@@ -13,14 +14,15 @@ const store = rootStore()
 </script>
 
 <template>
-  <div id="pl-window" :class="{ 'left-manu-collapsed': store.menuCollapsed }">
+  <div v-if="store.auth().isAuth" id="pl-window" :class="{ 'left-manu-collapsed': store.menuCollapsed }">
     <Header />
     <div id="pl-container">
       <MainTopBar />
       <RouterView />
     </div>
-    <Toast />
   </div>
+  <Login v-else />
+  <Toast />
 </template>
 
 <style lang="scss">

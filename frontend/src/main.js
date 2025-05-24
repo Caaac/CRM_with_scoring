@@ -6,13 +6,14 @@ import { createPinia } from 'pinia'
 
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
+import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 
 import App from './App.vue'
 import router from './router'
 
-import Axios from '@/api/axios'
-import {RestService} from '@/api/rest'
+import { instance } from '@/api/axios'
+import { RestService } from '@/api/rest'
 import '@/mixins/index'
 
 window.Rest = new RestService()
@@ -29,6 +30,7 @@ app.use(PrimeVue, {
     }
   }
 });
+app.use(ToastService);
 app.use(ConfirmationService);
-app.provide('$axios', Axios)
+app.provide('$axios', instance)
 app.mount('#app')

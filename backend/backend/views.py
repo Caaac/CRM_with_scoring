@@ -1,7 +1,11 @@
 import os
+
 from django.db import connection
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import authenticate, logout
+
 from rest_framework.decorators import api_view
+
 
 @api_view(['GET', 'POST'])
 def db_control(request, mode, module):
@@ -29,3 +33,20 @@ def db_control(request, mode, module):
     else:
         return HttpResponse(f"File '{sql_file_path}' does not exist", 500)
 
+
+@api_view(['GET'])
+def auth(request):
+    
+    # user = User.objects.create_user("test", "test@test.com", "test123")
+    # user.save()
+    
+    logout(request)
+    
+    return HttpResponse('1234', 200)
+    
+    user = authenticate(username="admin", password="qwerty1309")
+
+    if user is not None:
+        return JsonResponse("{'id': '00000'}", safe=False)
+    else:
+        return JsonResponse("{'id': '1234'}", safe=False)

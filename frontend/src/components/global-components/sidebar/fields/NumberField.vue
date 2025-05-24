@@ -24,13 +24,13 @@ const props = defineProps({
 });
 
 const model = defineModel({
-  type: String,
+  type: Number,
   required: true,
 });
 </script>
 
 <template>
-  <div class="string-field custom-field">
+  <div class="number-field custom-field">
     <div class="field-container">
       <div class="field-title">{{ props.fieldTitle }}</div>
       <div class="field-value">
@@ -56,7 +56,7 @@ const model = defineModel({
 </template>
 
 <style lang="scss">
-.string-field {
+.number-field {
   .field-container {
     display: flex;
     flex-direction: column;

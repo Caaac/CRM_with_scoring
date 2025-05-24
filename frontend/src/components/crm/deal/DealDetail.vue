@@ -9,6 +9,7 @@ import TabPanel from 'primevue/tabpanel';
 import TabPanels from 'primevue/tabpanels';
 /* Custom components */
 import FieldsCard from "@/components/global-components/sidebar/FieldsCard.vue";
+import EnumField from "@/components/global-components/sidebar/fields/EnumField.vue";
 import StringField from "@/components/global-components/sidebar/fields/StringField.vue";
 import NumberField from "@/components/global-components/sidebar/fields/NumberField.vue";
 import BoolenField from "@/components/global-components/sidebar/fields/BoolenField.vue";
@@ -78,6 +79,11 @@ const saveDeal = () => {
   // TODO: check mandatory fields
   store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value, false, true)
 }
+
+const updateUF = (value, field) => {
+  console.log(value, field);
+}
+
 </script>
 
 <template>
@@ -178,8 +184,53 @@ const saveDeal = () => {
                 </template>
 
                 <template v-if="field.user_type_id == 'boolean'">
-                  <BoolenField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
+                  <BoolenField v-model="field.values[0].value_int" :fieldTitle="field.title" :changeMode="changeMode"
                     :key="field.id" :binary="true" :trueValue="1" :falseValue="0" :data-field-name="field.field_name" />
+                </template>
+
+                <template v-if="field.user_type_id == 'number'">
+                  <NumberField v-model="field.values[0].value_double" :fieldTitle="field.title" :changeMode="changeMode"
+                    :key="field.id" :maxFractionDigits="2" :data-field-name="field.field_name">
+                    <template #display="{ model }">
+                      {{ model }}
+                    </template>
+                  </NumberField>
+                </template>
+
+                <template v-if="field.user_type_id == 'integer'">
+                  <NumberField v-model="field.values[0].value_int" :fieldTitle="field.title" :changeMode="changeMode"
+                    :key="field.id" :maxFractionDigits="0" :data-field-name="field.field_name">
+                    <template #display="{ model }">
+                      {{ model }}
+                    </template>
+                  </NumberField>
+                </template>
+
+                <template v-if="field.user_type_id == 'date'">
+                  <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
+                    :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
+                    :selectionMode="'single'" :data-field-name="field.field_name"
+                    :options="{ day: '2-digit', month: '2-digit', year: 'numeric', hour12: false }">
+                    <template #display="{ model }">
+                      {{ model }}
+                    </template>
+                  </CalendarField>
+                </template>
+
+                <template v-if="field.user_type_id == 'datetime'">
+                  <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
+                    :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
+                    :selectionMode="'single'" :showTime="true" :data-field-name="field.field_name">
+                    <template #display="{ model }">
+                      {{ model }}
+                    </template>
+                  </CalendarField>
+                </template>
+
+                <template v-if="field.user_type_id == 'enumirate'">
+                  <EnumField v-model="field.values" :fieldTitle="field.title" :changeMode="changeMode" :key="field.id"
+                    :validItems="field.user_field" :template="field.value_tmpl" :data-field-name="field.field_name"
+                    @update:modelValue="(value) => { updateUF(value, field) }" />
                 </template>
 
                 <!-- TODO Добавить оставшиеся поля -->

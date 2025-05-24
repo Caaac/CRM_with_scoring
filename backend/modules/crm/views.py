@@ -26,6 +26,8 @@ from modules.main.serializers import UserFieldSerializer
 from modules.crm.models import UtmCrmDeal
 from modules.crm.serializers import UtmCrmDealSerializer
 
+from modules.main.models import UserFieldEnum
+from modules.main.serializers import UserFieldEnumSerializer
 
 @api_view(['GET', 'POST', 'UPDATE', 'DELETE'])
 def statuses(request):
@@ -75,26 +77,14 @@ class Deal:
                 return JsonResponse({'result': False, 'message': 'Id not found!'})
 
             pk = request.GET['id']
+
+            try:
+                deal = CrmDeal.objects.get(pk=pk)
+            except CrmDeal.DoesNotExist:
+                return JsonResponse({'result': False, 'message': 'Deal not found!'}, status=status.HTTP_404_NOT_FOUND)
+
             deal = CrmDeal.objects.get(pk=pk)
             deal_data = CrmDealSerializer(deal).data
-
-            # Для конкретного поля сделки получаем характеристики поля
-            # deal_fields_value = UtmCrmDeal.objects.all().prefetch_related('field').filter(deal_id=pk)
-            # deal_fields_value_serializer = UtmCrmDealSerializer(deal_fields_value, many=True)
-
-            # deal_fields = {}
-            # for user_field in deal_fields_value_serializer.data:
-            #     if (user_field['field']['id'] not in deal_fields):
-            #         deal_fields[user_field['field']
-            #             ['id']] = user_field['field']
-            #         deal_fields[user_field['field']['id']]['values'] = []
-
-            #     value = {**user_field}
-            #     value.pop('field')
-
-            #     deal_fields[user_field['field']['id']]['values'].append(value)
-
-            # deal_data['uf_list'] = list(deal_fields.values())
 
             user_fields = UserField.objects.filter(entity_id='DEAL').all()
             user_fields_serializer = UserFieldSerializer(
@@ -111,28 +101,26 @@ class Deal:
                 deal_fields[uf['id']] = uf
 
             for uf_value in deal_fields_value_serializer.data:
-                # uf_value['field_id'] = uf_value['field']['id']
-                # del uf_value['field']
                 deal_fields[uf_value['field_id']]['values'].append(uf_value)
-                # deal_fields[uf_value['field']['id']]['values'].append(uf_value)
 
             for uf in deal_fields.values():
+                value_tmpl = {
+                    "id": 0,
+                    "deal_id": pk,
+                    "field_id": uf['id'],
+                    "value": None,
+                    "value_int": None,
+                    "value_double": None,
+                    "value_datetime": None,
+                }
+
+                if (uf['user_type_id'] == 'enumirate'):
+                    deal_fields[uf['id']]['value_tmpl'] = value_tmpl
+
                 if (not uf['values']):
-                    deal_fields[uf['id']]['values'] = [
-                        {
-                            "id": 0,
-                            "deal_id": pk,
-                            "field_id": uf['id'],
-                            "value": None,
-                            "value_int": None,
-                            "value_double": None,
-                            "value_datetime": None,
-                        }
-                    ]
+                    deal_fields[uf['id']]['values'] = [value_tmpl]
 
             deal_data['uf_list'] = list(deal_fields.values())
-
-            # print(deal_fields_value_serializer.data)
 
             # commit 2025-03-06
             # Получаем для конкретного поля все значения
@@ -151,7 +139,7 @@ class Deal:
         try:
             deal = CrmDeal.objects.get(id=request.data.get('id'))
         except CrmDeal.DoesNotExist:
-            return Response({'error': 'Сделка не найдена'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'result': False, 'message': 'Deal not found!'}, status=status.HTTP_404_NOT_FOUND)
 
         if (request.method == 'PUT'):
             deal_serializer = CrmDealSerializer(
@@ -162,17 +150,18 @@ class Deal:
                 uset_field = request.data.get('data').get('uf_list', [])
                 for field in uset_field:
                     for utm_value in field.get('values', []):
-                        # print(utm_value)
-                        utm_id = utm_value.get('id')
-                        if utm_id:
+                        if not utm_value.get('value') \
+                            and not utm_value.get('value_int') \
+                            and not utm_value.get('value_double') \
+                            and not utm_value.get('value_datetime'):
+                            UtmCrmDeal.objects.filter(id=utm_value['id']).delete()
+                        elif utm_id := utm_value.get('id'):
                             try:
                                 utm_crm_deal = UtmCrmDeal.objects.get(
                                     id=utm_id
                                 )
-                                print(utm_crm_deal, end='\n')
                                 for attr, value in utm_value.items():
                                     if attr != 'deal':
-                                        print(attr, value, end='\n')
                                         setattr(utm_crm_deal, attr, value)
                                 utm_crm_deal.save()
                             except UtmCrmDeal.DoesNotExist:
@@ -183,6 +172,7 @@ class Deal:
                             utm_serializer = UtmCrmDeal(
                                 deal=deal, field=field_obj, **utm_value)
                             utm_serializer.save()
+                            # print(utm_serializer.errors)
 
                 return Response(deal_serializer.data, status=status.HTTP_200_OK)
 
@@ -289,6 +279,26 @@ class Settings:
             user_fields_serializer = UserFieldSerializer(
                 UserField.objects.get(id=data['id']), data=data, partial=True
             )
+            
+            data_enum_ids = []
+            uf_enum = UserFieldEnum.objects.filter(user_field_id=data['id'])
+            for el in data.get('user_field', []):
+                if id := el.get('id'):
+                    data_enum_ids.append(id)
+                    ufn_serialeizer = UserFieldEnumSerializer(
+                        UserFieldEnum.objects.get(pk=id), 
+                        data=el,
+                    )
+                    if ufn_serialeizer.is_valid():
+                        ufn_serialeizer.save()
+                else:
+                    ufn_serialeizer = UserFieldEnumSerializer(data=el)
+                    if ufn_serialeizer.is_valid():
+                        data_enum_ids.append(ufn_serialeizer.save().id)
+            
+            for enum in uf_enum:
+                if (enum.id not in data_enum_ids):
+                    enum.delete()
 
             if user_fields_serializer.is_valid():
                 user_fields_serializer.save()
@@ -297,10 +307,9 @@ class Settings:
 
         if request.method == 'POST':
             data = JSONParser().parse(request)
-            field_name = 'UF_'
-            scope = {
-                'CRM': ['DEAL'],
-            }
+            prefix = 'UF_'
+            field_name = prefix
+            scope = { 'CRM': ['DEAL'] }
 
             for key, value in scope.items():
                 if data.get('entity_id') in value:
@@ -310,7 +319,7 @@ class Settings:
                 test_name = field_name + Settings.uf_index_generator().__next__()
                 exists = UserField.objects.filter(
                     field_name=test_name).exists()
-                if (not exists):
+                if not exists:
                     field_name = test_name
                     break
 
@@ -346,7 +355,7 @@ class Settings:
 
             user_filed = UserField.objects.get(id=data['id'])
             user_filed.delete()
-            
+
             return JsonResponse({'status': 'success', 'data': [], 'message': []}, status=status.HTTP_204_NO_CONTENT)
 
         # if request.method == 'DELETE':

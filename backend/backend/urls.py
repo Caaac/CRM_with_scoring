@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
+from django.conf.urls.static import static
+from backend.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
 
 from . import views, auth
 
@@ -24,6 +26,9 @@ urlpatterns = [
     path('api/v1/crm/', include('modules.crm.urls')),
     
     re_path(r'^(?P<mode>install|uninstall)/(?P<module>[a-z]+)/?$', views.db_control),
-    
-    path('auth/', auth.auth)
+    path('api/v1/drf-auth/', include('rest_framework.urls')),
+    path('auth/login/', auth.Auth.login),
 ]
+
+if DEBUG:
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

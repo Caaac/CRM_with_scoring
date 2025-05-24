@@ -39,13 +39,13 @@ export const userFieldStore = defineStore("userField", () => {
       },
     },
     {
-      type: "dateTime",
+      type: "datetime",
       options: {
         title: "Дата со временем",
       },
     },
     {
-      type: "list",
+      type: "enumirate",
       options: {
         title: "Список",
       },
@@ -106,16 +106,18 @@ export const userFieldStore = defineStore("userField", () => {
     );
   };
 
-  const updateUserField = () => {
+  const updateUserField = async () => {
     console.log(params.value.detailData);
+    return new Promise((rs, rj) => {
+      Rest.callMethod(
+        "crm.userField.update",
+        params.value.detailData,
+        (response) => {
+          rs(rs)
+        }
+      );
+    })
 
-    Rest.callMethod(
-      "crm.userField.update",
-      params.value.detailData,
-      (response) => {
-        console.log(response);
-      }
-    );
   };
 
   const deleteUserField = () => {

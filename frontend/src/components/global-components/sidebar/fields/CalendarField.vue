@@ -12,9 +12,29 @@ const props = defineProps({
     required: true,
   },
   dateFormat: String,
-  manualInput: Boolean,
-  selectionMode: String,
-  showTime: Boolean,
+  manualInput: {
+    type: Boolean,
+    default: false
+  },
+  selectionMode: {
+    type: String,
+    default: 'single'
+  },
+  showTime: {
+    type: Boolean,
+    default: false
+  },
+  options: {
+    type: Object,
+    default: () => ({
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false // 24-часовой формат
+    })
+  }
 });
 
 const emits = defineEmits(["click"]);
@@ -24,26 +44,16 @@ const model = defineModel({
   required: true,
 });
 
-const options = ref({
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  // second: '2-digit',
-  hour12: false // 24-часовой формат
-});
-
 </script>
 
 <template>
-  <div class="string-field custom-field">
+  <div class="calendar-field custom-field">
     <div class="field-container">
       <div class="field-title">{{ props.fieldTitle }}</div>
       <div class="field-value">
         <template v-if="!props.changeMode">
 
-          {{ (new Date(model)).toLocaleString('ru-RU', options).replace(',', '') }}
+          {{ (new Date(model)).toLocaleString('ru-RU', props.options).replace(',', '') }}
         </template>
         <template v-else>
           <Calendar v-model="model" :dateFormat="props.dateFormat" :manualInput="props.manualInput"
@@ -59,7 +69,7 @@ const options = ref({
 </template>
 
 <style lang="scss">
-.string-field {
+.calendar-field {
   .field-container {
     display: flex;
     flex-direction: column;

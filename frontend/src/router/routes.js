@@ -89,12 +89,17 @@ const routes = [
       {
         path: "user-field/:entity/",
         name: "uf-deal",
-        component: () => import("@/components/settings/UserField.vue"),
+        component: () => import("@/components/settings/crm/user-field/UserField.vue"),
       },
       {
         path: "user-field/:entity/:field_name/",
         name: "uf-deal-detail",
-        component: () => import("@/components/settings/UserFieldDetail.vue"),
+        component: () => import("@/components/settings/crm/user-field/UserFieldDetail.vue"),
+      },
+      {
+        path: "kanban/stages/",
+        name: "uf-deal-detail",
+        component: () => import("@/components/settings/crm/kanban/Stage.vue"),
       },
     ],
   },

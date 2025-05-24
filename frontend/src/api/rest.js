@@ -1,87 +1,42 @@
-import instance from "@/api/axios";
 import axios from "axios";
+
+import { rootStore } from "@/stores";
+
+import { instance } from "@/api/axios";
+
+import AuthApi from "@/api/classes/auth";
+import DealApi from "@/api/classes/deal";
+import StatusApi from "@/api/classes/status";
+import SettingsApi from "@/api/classes/settings";
+
 
 class RestService {
   constructor() {
-    this.API_BASE_PATH = "/api/v1/";
     this.relation = {
-      /**
-       * Status
-       */
-      "crm.status.get": {
-        path: this.API_BASE_PATH + "crm/status/",
-        method: "GET",
-      },
-
-      /**
-       * Deal
-       */
-      "crm.deal.get": {
-        path: this.API_BASE_PATH + "crm/deal/",
-        method: "GET",
-      },
-      "crm.deal.update": {
-        path: this.API_BASE_PATH + "crm/deal/",
-        method: "PUT",
-      },
-      "crm.deal.detail.get": {
-        path: this.API_BASE_PATH + "crm/detail/deal/",
-        method: "GET",
-      },
-      "crm.deal.detail.update": {
-        path: this.API_BASE_PATH + "crm/detail/deal/",
-        method: "PUT",
-      },
-      "crm.deal.init.kanban": {
-        path: this.API_BASE_PATH + "crm/deal/kanban/",
-        method: "GET",
-      },
-      "crm.deal.init.list": {
-        path: this.API_BASE_PATH + "crm/deal/list/",
-        method: "GET",
-      },
-
-      /**
-       * Settings
-       * -- User Fields
-       */
-      "crm.userField.list": {
-        path: this.API_BASE_PATH + "crm/settings/user-field/",
-        method: "GET",
-      },
-      "crm.userField.get": {
-        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
-        method: "GET",
-      },
-      "crm.userField.update": {
-        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
-        method: "PUT",
-      },
-      "crm.userField.add": {
-        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
-        method: "POST",
-      },
-      "crm.userField.delete": {
-        path: this.API_BASE_PATH + "crm/settings/user-field-detail/",
-        method: "DELETE",
-      },
+      ...AuthApi.relation,
+      ...DealApi.relation,
+      ...StatusApi.relation,
+      ...SettingsApi.relation,
     };
   }
 
   async callMethod(method, params, callBack) {
     if (!this.relation[method]) {
       return new Promise((_, reject) => {
-        reject({ error: "method not found", status: 404 });
+        reject(callBack({ error: "method not found", status: 404 }));
       });
     }
 
     return new Promise(async (resolve, reject) => {
-      this.runQuery(this.relation[method], params)
+      this.runQuery(this.relation[method], params, this.getHeaders(method))
         .then((r) => {
           resolve(callBack(r));
         })
         .catch((e) => {
-          reject(e);
+          if (e.status == 401) {
+            this.disableAuthorization();
+          }
+          reject(callBack(e));
         });
     });
   }
@@ -92,7 +47,11 @@ class RestService {
 
     keys.forEach((key) => {
       methods.push(
-        this.getInstanse(this.relation[commands[key][0]], commands[key][1])
+        this.getInstanse(
+          this.relation[commands[key][0]],
+          commands[key][1],
+          this.getHeaders(commands[key][0])
+        )
       );
     });
 
@@ -111,24 +70,47 @@ class RestService {
           })
         )
         .catch((e) => {
-          reject(e);
+          if (e.status == 401) {
+            this.disableAuthorization();
+          }
+          reject(callBack(e));
         });
     });
   }
 
-  async runQuery(serverData, params) {
-    return await this.getInstanse(serverData, params);
+  async runQuery(serverData, params, headers = {}) {
+    return await this.getInstanse(serverData, params, headers);
   }
 
-  getInstanse(serverData, params) {
+  getInstanse(serverData, params, headers = {}) {
     if (serverData.method == "GET") {
-      return instance.get(serverData.path, { params: params });
+      return instance.get(serverData.path, { params: params, headers: { ...headers } });
     } else if (serverData.method == "POST") {
-      return instance.post(serverData.path, params);
+      return instance.post(serverData.path, params, { headers: { ...headers } });
     } else if (serverData.method == "PUT") {
-      return instance.put(serverData.path, params);
+      return instance.put(serverData.path, params, { headers: { ...headers } });
     } else if (serverData.method == "DELETE") {
-      return instance.delete(serverData.path, { data: params });
+      return instance.delete(serverData.path, { data: params }, { headers: { ...headers } });
+    }
+  }
+
+  getHeaders(method) {
+    switch (method) {
+      case "auth.login":
+        return {}
+      default:
+        return {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        };
+    }
+  }
+
+  disableAuthorization() {
+    try {
+      const store = rootStore()
+      store.auth().isAuth = false
+    } catch (error) {
+      console.log('_ERROR', error);
     }
   }
 }

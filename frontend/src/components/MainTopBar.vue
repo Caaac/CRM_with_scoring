@@ -20,7 +20,7 @@ const menuPopover = ref(null)
 
 const menuItems = ref([
   {
-    label: 'Настройка моделя',
+    label: 'Настройка модуля',
     icon: 'pi pi-file',
     items: [
       {
@@ -32,6 +32,13 @@ const menuItems = ref([
             icon: 'pi pi-plus',
             command: () => {
               router.push({ path: '/settings/user-field/deal/' })
+            }
+          },
+          {
+            label: 'Стадии',
+            icon: 'pi pi-plus',
+            command: () => {
+              router.push({ path: '/settings/kanban/stages/' })
             }
           }
         ]
@@ -52,8 +59,8 @@ const menuItems = ref([
 <template>
   <div class="pl-top-container">
     <div class="pl-top-container-wrapper">
-      <Button @click="store.menuCollapsed = !store.menuCollapsed" severity="secondary"
-        variant="text" rounded aria-label="Bookmark">
+      <Button @click="store.menuCollapsed = !store.menuCollapsed" severity="secondary" variant="text" rounded
+        aria-label="Bookmark">
         <template #icon>
           <MenuOpen class="pl-icon" />
         </template>
@@ -64,7 +71,8 @@ const menuItems = ref([
       <Button @click="(event) => { menuPopover.toggle(event) }" severity="secondary" variant="text" rounded
         aria-label="Bookmark" aria-controls="overlay_tmenu">
         <template #icon>
-          <MenuOpen class="pl-icon" />
+          <!-- <MenuOpen class="pl-icon" /> -->
+          <span class="pi pi-cog"></span>
         </template>
       </Button>
     </div>

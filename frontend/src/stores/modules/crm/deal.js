@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref, computed, inject } from "vue";
 
 export const dealStore = defineStore("deal", () => {
-  const $axios = inject('$axios')
+  // const $axios = inject('$axios')
 
   const deal_fields = ref([])
   const deal_detail = ref({})

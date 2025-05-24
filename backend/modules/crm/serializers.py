@@ -23,13 +23,16 @@ class UtmCrmDealSerializer(serializers.ModelSerializer):
 
         if not include_field:
             self.fields.pop('field')
-            
+            self.fields.pop('deal')
+
     # def create(self, deal, field, validated_data):
-        
 
     class Meta:
         model = UtmCrmDeal
         fields = '__all__'
+        extra_kwargs = {
+            'id': {'required': False},
+        }
 
 
 class CrmDealSerializer(serializers.ModelSerializer):

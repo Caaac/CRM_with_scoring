@@ -17,6 +17,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload')
+MEDIA_URL = '/upload/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -42,19 +44,20 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'api',
-    'modules.crm',
-    'modules.main',
+    'modules.crm.apps.CrmConfig',
+    'modules.main.apps.MainConfig',
 ]
 
 REST_FRAMEWORK = {
-    # TODO
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.TokenAuthentication',  # Аутентификация по токену
-    # ],
-    #  'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    # ]
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
 
 MIDDLEWARE = [
@@ -68,8 +71,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ORIGIN_WHITELIST = ["http://localhost:8080"]
+# CORS_ORIGIN_WHITELIST = ["http://localhost:5173"]
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -92,6 +96,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
+SIMPLE_JWT = {
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(hours=12),
+}
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -101,15 +112,13 @@ DATABASES = {
         'NAME': 'crm-sistem',
         'USER': 'root',
         'PASSWORD': 'qwerty1309',
-        # 'HOST': '127.0.0.1', # from OS
-        'HOST': 'db',  # from docker
+        'HOST': 'db',
         'PORT': '3306',
-        # "COLLATION": "utf8mb3_bin",
-        # "TEST": {
-        #     "COLLATION": "utf8mb3_bin",
-        # },
     }
 }
+
+AUTH_USER_MODEL = 'main.User'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Password validation
@@ -180,3 +189,4 @@ LOGGING = {
         'propagate': False,
     },
 }
+
