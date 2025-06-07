@@ -45,25 +45,22 @@ class Auth:
         login = data.get('login', None)
         password = data.get('password', None)
 
-        print(1)
-
         if login is None or password is None:
             return Response({'status': 'error', 'message': 'login and password required'}, 400)
 
-        print(2)
         # User = get_user_model()
         user = authenticate(username=login, password=password)
 
         if user is None:
             return Response({'status': 'error', 'message': 'uncorrect login or password'}, 400)
-        print(3)
+        
         refresh = RefreshToken.for_user(user)
 
         refresh.payload.update({
             'user_id': user.id,
             'username': user.login
         })
-        print(4)
+
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),

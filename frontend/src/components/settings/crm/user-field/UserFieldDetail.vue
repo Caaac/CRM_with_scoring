@@ -63,6 +63,8 @@ const init = () => {
     is_searchable: 0,
   };
 
+  console.log(addMode.value);
+
   if (!addMode.value) {
     store.settings().userField().initDetail({
       field_name: route.params.field_name,

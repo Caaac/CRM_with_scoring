@@ -1,6 +1,6 @@
 <script setup>
 import Calendar from "primevue/calendar";
-import { ref } from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
   changeMode: {
@@ -34,6 +34,10 @@ const props = defineProps({
       minute: '2-digit',
       hour12: false // 24-часовой формат
     })
+  },
+  mandatory: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -44,16 +48,21 @@ const model = defineModel({
   required: true,
 });
 
+const formatedDate = computed(() => {
+  return model.value
+    ? (new Date(model.value)).toLocaleString('ru-RU', props.options).replace(',', '')
+    : 'отсуствует'
+})
+
 </script>
 
 <template>
   <div class="calendar-field custom-field">
     <div class="field-container">
-      <div class="field-title">{{ props.fieldTitle }}</div>
+      <div class="field-title">{{ props.fieldTitle }}<span v-if="props.mandatory" class="required-field"></span></div>
       <div class="field-value">
         <template v-if="!props.changeMode">
-
-          {{ (new Date(model)).toLocaleString('ru-RU', props.options).replace(',', '') }}
+          {{ formatedDate }}
         </template>
         <template v-else>
           <Calendar v-model="model" :dateFormat="props.dateFormat" :manualInput="props.manualInput"

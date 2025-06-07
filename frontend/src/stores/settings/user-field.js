@@ -64,6 +64,8 @@ export const userFieldStore = defineStore("userField", () => {
   };
 
   const initDetail = (options) => {
+    console.log(1111);
+    
     Rest.callMethod(
       "crm.userField.get",
       { field_name: options.field_name },

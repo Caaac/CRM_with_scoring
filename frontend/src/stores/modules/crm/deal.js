@@ -14,7 +14,7 @@ export const dealStore = defineStore("deal", () => {
   const statusType = computed(() => {
     const userStatus = []
     const sysStatus = []
-  
+
     Object.entries(params.value?.stage_data || {}).forEach(([stageKey, stageData]) => {
       if (stageData.status_data.system_status == 1 && stageData.status_data.sort == 0) {
         sysStatus.push(stageData)
@@ -22,7 +22,7 @@ export const dealStore = defineStore("deal", () => {
         userStatus.push(stageData)
       }
     });
-  
+
     return {
       userStatus,
       sysStatus
@@ -30,35 +30,27 @@ export const dealStore = defineStore("deal", () => {
   })
 
   const init = (displayMode = '') => {
-    // const cmd = {};
-    // cmd['status'] = ['crm.status.get', {}];
-    // cmd['deals'] = ['crm.deal.get', {}];
-
-    // Rest.callBatch(cmd, (response) => {
-    //   console.log(response);
-    //   Object.keys(response).forEach(key => {
-    //     params.value[key] = response[key].data
-    //   })
-    // })
-
     Rest.callMethod('crm.deal.init.kanban', {}, (response) => {
       params.value = response.data
     })
   }
 
-  const getDealDetail = (id, load = true) => {
+  const getDealDetail = async (id, load = true) => {
     loading.value.deal_detail = load
-    Rest.callMethod('crm.deal.detail.get', {id: id}, (response) => {
-      deal_detail.value = response.data
-      console.log(response);
-      loading.value.deal_detail = false
+    return new Promise((resolve, reject) => {
+      Rest.callMethod('crm.deal.detail.get', { id: id }, (response) => {
+        if (response.data.result == false) reject(response.data)
+        deal_detail.value = response.data
+        loading.value.deal_detail = false
+        resolve(response.data)
+      })
     })
   }
 
   const updateDeal = (id, data, updateDeals = false, updateDetail = false) => {
-    Rest.callMethod('crm.deal.update', {id: id, data: data}, (response) => {
+    Rest.callMethod('crm.deal.update', { id: id, data: data }, (response) => {
       console.log('crm.deal.update', response);
-      
+
       if (updateDeals) {
         init()
       }
@@ -69,18 +61,29 @@ export const dealStore = defineStore("deal", () => {
   }
 
   const updateDealDetail = (id, data, updateDeals = false, updateDetail = false) => {
-    console.log('pre crm.deal.detail.update', {id: id, data: data});
-    
-    Rest.callMethod('crm.deal.detail.update', {id: id, data: data}, (response) => {
+    Rest.callMethod('crm.deal.detail.update', { id: id, data: data }, (response) => {
       console.log('crm.deal.detail.update', response);
-      if (updateDeals) {
-        init()
-      }
-      if (updateDetail) {
-        getDealDetail(id, false)
-      }
+
+      if (updateDeals) init()
+      if (updateDetail) getDealDetail(id, false)
+
     })
   }
 
-  return { params, deal_detail, deal_fields, init, getDealDetail, loading, statusType, updateDeal, updateDealDetail};
+  const createDeal = async (data, updateDeals = false, updateDetail = false) => {
+    return new Promise((resolve, reject) => {
+      Rest.callMethod('crm.deal.detail.add', { data: data }, (response) => {
+        console.log(response.data);
+        
+        if (response.status == 'error') reject(response.data)
+
+        if (updateDeals) init()
+        if (updateDetail) getDealDetail(response.data.data.id, false)
+
+        resolve(response.data)
+      })
+    })
+  }
+
+  return { params, deal_detail, deal_fields, init, getDealDetail, loading, statusType, updateDeal, updateDealDetail, createDeal };
 });

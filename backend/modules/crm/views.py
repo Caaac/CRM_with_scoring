@@ -1,3 +1,7 @@
+# import another
+from .classes.settings import UserFieldsListView, UserFieldDetailsView
+from .classes.deal import DealDetail
+
 import os
 import json
 import random
@@ -20,14 +24,6 @@ from rest_framework.parsers import JSONParser
 from .models import CrmStatus, CrmDeal
 from .serializers import CrmStatusSerializer, CrmDealSerializer
 
-from modules.main.models import UserField
-from modules.main.serializers import UserFieldSerializer
-
-from modules.crm.models import UtmCrmDeal
-from modules.crm.serializers import UtmCrmDealSerializer
-
-from modules.main.models import UserFieldEnum
-from modules.main.serializers import UserFieldEnumSerializer
 
 @api_view(['GET', 'POST', 'UPDATE', 'DELETE'])
 def statuses(request):
@@ -70,119 +66,6 @@ class Deal:
 
         return JsonResponse([], safe=False)
 
-    @api_view(['GET', 'POST', 'PUT', 'DELETE'])
-    def deal_detail(request):
-        if request.method == 'GET':
-            if 'id' not in list(request.GET):
-                return JsonResponse({'result': False, 'message': 'Id not found!'})
-
-            pk = request.GET['id']
-
-            try:
-                deal = CrmDeal.objects.get(pk=pk)
-            except CrmDeal.DoesNotExist:
-                return JsonResponse({'result': False, 'message': 'Deal not found!'}, status=status.HTTP_404_NOT_FOUND)
-
-            deal = CrmDeal.objects.get(pk=pk)
-            deal_data = CrmDealSerializer(deal).data
-
-            user_fields = UserField.objects.filter(entity_id='DEAL').all()
-            user_fields_serializer = UserFieldSerializer(
-                user_fields, many=True)
-
-            deal_fields_value = UtmCrmDeal.objects.filter(deal_id=pk).all()
-            deal_fields_value_serializer = UtmCrmDealSerializer(
-                deal_fields_value, many=True)
-
-            deal_fields = {}
-
-            for uf in user_fields_serializer.data:
-                uf['values'] = []
-                deal_fields[uf['id']] = uf
-
-            for uf_value in deal_fields_value_serializer.data:
-                deal_fields[uf_value['field_id']]['values'].append(uf_value)
-
-            for uf in deal_fields.values():
-                value_tmpl = {
-                    "id": 0,
-                    "deal_id": pk,
-                    "field_id": uf['id'],
-                    "value": None,
-                    "value_int": None,
-                    "value_double": None,
-                    "value_datetime": None,
-                }
-
-                if (uf['user_type_id'] == 'enumirate'):
-                    deal_fields[uf['id']]['value_tmpl'] = value_tmpl
-
-                if (not uf['values']):
-                    deal_fields[uf['id']]['values'] = [value_tmpl]
-
-            deal_data['uf_list'] = list(deal_fields.values())
-
-            # commit 2025-03-06
-            # Получаем для конкретного поля все значения
-            # user_fields = UserField.objects.prefetch_related('utm_crm_deals').all()
-            # serializer = UserFieldSerializer(user_fields, many=True)
-            # return Response(serializer.data)
-
-            return JsonResponse(deal_data, safe=False)
-
-        if (not request.data.get('id', 0)):
-            return JsonResponse({'result': False, 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if (not request.data.get('data', None)):
-            return JsonResponse({'result': False, 'message': 'Data not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            deal = CrmDeal.objects.get(id=request.data.get('id'))
-        except CrmDeal.DoesNotExist:
-            return Response({'result': False, 'message': 'Deal not found!'}, status=status.HTTP_404_NOT_FOUND)
-
-        if (request.method == 'PUT'):
-            deal_serializer = CrmDealSerializer(
-                deal, data=request.data.get('data'), partial=True)
-            if deal_serializer.is_valid():
-                deal_serializer.save()
-
-                uset_field = request.data.get('data').get('uf_list', [])
-                for field in uset_field:
-                    for utm_value in field.get('values', []):
-                        if not utm_value.get('value') \
-                            and not utm_value.get('value_int') \
-                            and not utm_value.get('value_double') \
-                            and not utm_value.get('value_datetime'):
-                            UtmCrmDeal.objects.filter(id=utm_value['id']).delete()
-                        elif utm_id := utm_value.get('id'):
-                            try:
-                                utm_crm_deal = UtmCrmDeal.objects.get(
-                                    id=utm_id
-                                )
-                                for attr, value in utm_value.items():
-                                    if attr != 'deal':
-                                        setattr(utm_crm_deal, attr, value)
-                                utm_crm_deal.save()
-                            except UtmCrmDeal.DoesNotExist:
-                                pass
-                        else:
-                            field_obj = UserField.objects.get(id=field['id'])
-                            del utm_value['id']
-                            utm_serializer = UtmCrmDeal(
-                                deal=deal, field=field_obj, **utm_value)
-                            utm_serializer.save()
-                            # print(utm_serializer.errors)
-
-                return Response(deal_serializer.data, status=status.HTTP_200_OK)
-
-            return Response(deal_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        if request.method == 'DELETE':
-            deal.delete()
-            return JsonResponse({'result': True, 'message': 'Deal was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-        return JsonResponse([], safe=False)
 
 
 class PageInit:
@@ -220,6 +103,7 @@ class PageInit:
         for status_id in unique_status:
             stage_data[status_id] = {
                 'status_data': {},
+                'sum_opportunity': 0,
                 'data': []
             }
 
@@ -231,157 +115,10 @@ class PageInit:
             for deal in entity_list:
                 if deal['stage_id'] == status_id:
                     stage_data[status_id]['data'].append(deal)
+                    stage_data[status_id]['sum_opportunity'] += int(deal['opportunity'] or 0)
 
         stage_data = dict(
             sorted(stage_data.items(), key=lambda x: x[1]['status_data']['sort']))
 
         return stage_data
 
-
-class Settings:
-    def __init__(self):
-        pass
-
-    @api_view(['GET'])
-    def user_field_list(request):
-        user_fields = UserField.objects.all()
-        user_fields_serializer = UserFieldSerializer(user_fields, many=True)
-        return JsonResponse(user_fields_serializer.data, safe=False)
-
-        # user_fields = UserField.objects.prefetch_related('utm_crm_deals').all()
-        # serializer = UserFieldSerializer(user_fields, many=True)
-        # return Response(serializer.data)
-
-    @api_view(['GET', 'PUT', 'POST', 'DELETE'])
-    def user_field_detail(request):
-        if request.method == 'GET':
-            # Settings.user_field_detail_GET(request)
-            try:
-                if id := request.GET.get('field_name'):
-                    user_fields = UserField.objects.get(field_name=id)
-                elif id := request.GET.get('id'):
-                    user_fields = UserField.objects.get(id=id)
-                else:
-                    return JsonResponse({'result': False, 'message': 'Field not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-                user_fields_serializer = UserFieldSerializer(
-                    user_fields, many=False)
-                return JsonResponse(user_fields_serializer.data, safe=False)
-            except UserField.DoesNotExist:
-                return JsonResponse({'result': False, 'message': 'Field not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if request.method == 'PUT':
-            data = JSONParser().parse(request)
-
-            if ('id' not in data.keys()):
-                return JsonResponse({'result': False, 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-            user_fields_serializer = UserFieldSerializer(
-                UserField.objects.get(id=data['id']), data=data, partial=True
-            )
-            
-            data_enum_ids = []
-            uf_enum = UserFieldEnum.objects.filter(user_field_id=data['id'])
-            for el in data.get('user_field', []):
-                if id := el.get('id'):
-                    data_enum_ids.append(id)
-                    ufn_serialeizer = UserFieldEnumSerializer(
-                        UserFieldEnum.objects.get(pk=id), 
-                        data=el,
-                    )
-                    if ufn_serialeizer.is_valid():
-                        ufn_serialeizer.save()
-                else:
-                    ufn_serialeizer = UserFieldEnumSerializer(data=el)
-                    if ufn_serialeizer.is_valid():
-                        data_enum_ids.append(ufn_serialeizer.save().id)
-            
-            for enum in uf_enum:
-                if (enum.id not in data_enum_ids):
-                    enum.delete()
-
-            if user_fields_serializer.is_valid():
-                user_fields_serializer.save()
-                return JsonResponse(user_fields_serializer.data, safe=False, status=status.HTTP_200_OK)
-            return JsonResponse(user_fields_serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-
-        if request.method == 'POST':
-            data = JSONParser().parse(request)
-            prefix = 'UF_'
-            field_name = prefix
-            scope = { 'CRM': ['DEAL'] }
-
-            for key, value in scope.items():
-                if data.get('entity_id') in value:
-                    field_name += key + '_'
-
-            while True:
-                test_name = field_name + Settings.uf_index_generator().__next__()
-                exists = UserField.objects.filter(
-                    field_name=test_name).exists()
-                if not exists:
-                    field_name = test_name
-                    break
-
-            data['field_name'] = field_name
-            user_fields_serializer = UserFieldSerializer(data=data)
-
-            if user_fields_serializer.is_valid():
-                user_fields_serializer.save()
-                return JsonResponse(
-                    {
-                        'status': 'success',
-                        'data': user_fields_serializer.data,
-                        'error': None,
-                    },
-                    safe=False,
-                    status=status.HTTP_201_CREATED
-                )
-            return JsonResponse(
-                {
-                    'status': 'error',
-                    'data': None,
-                    'error': user_fields_serializer.errors,
-                },
-                safe=False,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if request.method == 'DELETE':
-            data = JSONParser().parse(request)
-
-            if ('id' not in data.keys()):
-                return JsonResponse({'status': 'error', 'data': [], 'message': 'Id not found!'}, status=status.HTTP_400_BAD_REQUEST)
-
-            user_filed = UserField.objects.get(id=data['id'])
-            user_filed.delete()
-
-            return JsonResponse({'status': 'success', 'data': [], 'message': []}, status=status.HTTP_204_NO_CONTENT)
-
-        # if request.method == 'DELETE':
-        #     user_fields = UserField.objects.get(id=request.GET.get('id'))
-        #     user_fields.delete()
-        #     return JsonResponse({'result': True, 'message': 'Field was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-    def user_field_detail_GET(request):
-        try:
-            if id := request.GET.get('field_name'):
-                user_fields = UserField.objects.get(field_name=id)
-            elif id := request.GET.get('id'):
-                user_fields = UserField.objects.get(id=id)
-            else:
-                return JsonResponse({'error': 'Поле не найдено'}, status=status.HTTP_404_NOT_FOUND)
-
-            user_fields_serializer = UserFieldSerializer(
-                user_fields, many=False)
-            return JsonResponse(user_fields_serializer.data, safe=False)
-        except UserField.DoesNotExist:
-            return JsonResponse({'error': 'Поле не найдено'}, status=status.HTTP_404_NOT_FOUND)
-
-    @staticmethod
-    def uf_index_generator():
-        while True:
-            length = random.randint(10, 13)
-            number = ''.join(random.choice(string.digits)
-                             for _ in range(length))
-            yield str(int(number))

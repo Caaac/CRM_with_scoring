@@ -16,6 +16,7 @@ class UserFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserField
         fields = '__all__'
+        
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

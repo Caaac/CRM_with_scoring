@@ -14,6 +14,10 @@ export default class DealApi extends Api {
       path: this.API_BASE_PATH + "crm/detail/deal/",
       method: "GET",
     },
+    "crm.deal.detail.add": {
+      path: this.API_BASE_PATH + "crm/detail/deal/",
+      method: "POST",
+    },
     "crm.deal.detail.update": {
       path: this.API_BASE_PATH + "crm/detail/deal/",
       method: "PUT",

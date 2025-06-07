@@ -9,6 +9,10 @@ const props = defineProps({
   'fieldTitle': {
     type: String,
     required: true
+  },
+  'mandatory': {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -22,7 +26,7 @@ const model = defineModel({
 <template>
   <div class="string-field custom-field">
     <div class="field-container">
-      <div class="field-title">{{ props.fieldTitle }}</div>
+      <div class="field-title">{{ props.fieldTitle }}<span v-if="props.mandatory" class="required-field"></span></div>
       <div class="field-value">
         <template v-if="!props.changeMode">
           {{ model }}

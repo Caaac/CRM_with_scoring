@@ -22,6 +22,10 @@ const props = defineProps({
   template: {
     type: Object,
     default: () => ({}.deepCopy())
+  },
+  mandatory: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -42,7 +46,7 @@ const addNewItem = () => {
 <template>
   <div class="enum-field custom-field">
     <div class="field-container">
-      <div class="field-title">{{ props.fieldTitle }}</div>
+      <div class="field-title">{{ props.fieldTitle }}<span v-if="props.mandatory" class="required-field"></span></div>
       <div class="field-value field-enum">
         <div v-for="(enumElement, index) in model" :key="enumElement.id" class="field-enum-item">
           <template v-if="!props.changeMode">

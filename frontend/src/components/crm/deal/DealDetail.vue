@@ -2,6 +2,7 @@
 /* PrimeVue components */
 import Tab from 'primevue/tab';
 import Tabs from 'primevue/tabs';
+import Button from 'primevue/button';
 import Sidebar from "primevue/sidebar";
 import TabList from 'primevue/tablist';
 import Skeleton from "primevue/skeleton";
@@ -28,9 +29,14 @@ const { params, loading, deal_detail, statusType } = storeToRefs(store.crm().dea
 
 const visiblee = ref(true);
 
-onMounted(() => {
-  store.crm().deal().getDealDetail(route.params.idDeal);
+
+onMounted(async () => {
+  await store.crm().deal().getDealDetail(route.params.idDeal);
+  deal_detail.value.title = 'Новая сделка'
 });
+
+
+const isNew = computed(() => route.params.idDeal == 0)
 
 /**
  * @returns 0..n - index of status
@@ -41,12 +47,6 @@ const stageId = computed(() => {
   let result = -2;
   if (Object.keys(deal_detail.value).length) {
     statusType.value["userStatus"].forEach((element, index) => {
-      console.log(
-        element.status_data.status_id,
-        deal_detail.value.stage_id,
-        element.status_data.status_id == deal_detail.value.stage_id
-      );
-
       if (element.status_data.status_id == deal_detail.value.stage_id) {
         result = index;
       }
@@ -75,9 +75,20 @@ const finalStageStyle = computed(() => {
   return result;
 });
 
+
 const saveDeal = () => {
   // TODO: check mandatory fields
   store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value, false, true)
+}
+
+const createDeal = async () => {
+  // TODO: check mandatory fields
+  deal_detail.value.assigned_by_id = store.user().params.account.id
+  deal_detail.value.created_by_id = store.user().params.account.id
+
+  const newDealData = await store.crm().deal().createDeal(deal_detail.value, false, true)
+  console.log('newDealData', newDealData);
+  router.push({ path: `/crm/deal/details/${newDealData.data.id}/` })
 }
 
 const updateUF = (value, field) => {
@@ -87,7 +98,7 @@ const updateUF = (value, field) => {
 </script>
 
 <template>
-  <Sidebar v-model:visible="visiblee" @hide="router.go(-1); store.crm().deal().init();" id="deal-detail-sidebar"
+  <Sidebar v-model:visible="visiblee" @hide="router.push({ path: '/crm/deal/kanban/' }); store.crm().deal().init()" id="deal-detail-sidebar"
     class="propel-sidebar" position="right">
     <template #header>
       <Skeleton v-if="loading.deal_detail" class="sidebar-skeleton-header"></Skeleton>
@@ -117,23 +128,110 @@ const updateUF = (value, field) => {
     </div>
 
     <div class="container">
-      <!-- <Tabs value="0">
+      <Tabs id="deal-detail-main-tabs" value="0">
         <TabList>
-          <Tab value="0">Header I</Tab>
-          <Tab value="1">Header II</Tab>
+          <Tab value="0">Общее</Tab>
+          <Tab value="1">Анализ</Tab>
         </TabList>
-        <TabPanels>
-          <TabPanel value="0">
-            <p class="m-0">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore
-              magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-              commodo
-              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-              pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
-              id
-              est laborum.
-            </p>
+        <TabPanels :class="{ '__new-mode': isNew }">
+          <TabPanel value="0" class="d-flex">
+            <div class="deal-field">
+              <FieldsCard @save="saveDeal" class="mb-1" :hide-mode-btn="isNew" :change-mode="isNew">
+                <template #header>Общая</template>
+                <template #default="{ changeMode }">
+                  <div class="field-wrapper">
+                    <StringField v-model="deal_detail.title" v-if="changeMode" :fieldTitle="'Наименование сделки'"
+                      :changeMode="changeMode" />
+                    <NumberField v-model="deal_detail.opportunity" :fieldTitle="'Сумма'" :changeMode="changeMode"
+                      :useGrouping="true" :suffix="' ₽'" :mandatory="true">
+                      <template #display="{ model }">
+                        <span style="font-size: 20px; font-weight: 300">{{ model ? model.toMonetarily() : "" }}</span>
+                      </template>
+                    </NumberField>
+                    <BoolenField v-model="deal_detail.is_new" :fieldTitle="'Новая сделка'" :changeMode="changeMode"
+                      :binary="true" :trueValue="1" :falseValue="0" />
+                    <CalendarField v-model="deal_detail.date_create" :fieldTitle="'Дата создания'" :changeMode="false"
+                      :dateFormat="'dd.mm.yy'" :showTime="true" />
+                    <CalendarField v-model="deal_detail.date_modify" :fieldTitle="'Дата изменения'" :changeMode="false"
+                      :dateFormat="'dd.mm.yy'" :showTime="true" />
+                  </div>
+                </template>
+              </FieldsCard>
+
+              <FieldsCard @save="saveDeal" :hide-mode-btn="isNew" :change-mode="isNew">
+                <template #header>Пользовательские поля</template>
+                <template #default="{ changeMode }">
+                  <div class="field-wrapper">
+                    <template v-for="field in deal_detail.uf_list">
+                      <template v-if="field.user_type_id == 'string'">
+                        <StringField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
+                          :key="field.id" :data-field-name="field.field_name" :mandatory="field.mandatory" />
+                      </template>
+
+                      <template v-if="field.user_type_id == 'boolean'">
+                        <BoolenField v-model="field.values[0].value_int" :fieldTitle="field.title"
+                          :changeMode="changeMode" :key="field.id" :binary="true" :trueValue="1" :falseValue="0"
+                          :data-field-name="field.field_name" :mandatory="field.mandatory" />
+                      </template>
+
+                      <template v-if="field.user_type_id == 'number'">
+                        <NumberField v-model="field.values[0].value_double" :fieldTitle="field.title"
+                          :changeMode="changeMode" :key="field.id" :maxFractionDigits="2"
+                          :data-field-name="field.field_name" :mandatory="field.mandatory">
+                          <template #display="{ model }">
+                            {{ model }}
+                          </template>
+                        </NumberField>
+                      </template>
+
+                      <template v-if="field.user_type_id == 'integer'">
+                        <NumberField v-model="field.values[0].value_int" :fieldTitle="field.title"
+                          :changeMode="changeMode" :key="field.id" :maxFractionDigits="0"
+                          :data-field-name="field.field_name" :mandatory="field.mandatory">
+                          <template #display="{ model }">
+                            {{ model }}
+                          </template>
+                        </NumberField>
+                      </template>
+
+                      <template v-if="field.user_type_id == 'date'">
+                        <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
+                          :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
+                          :selectionMode="'single'" :data-field-name="field.field_name"
+                          :options="{ day: '2-digit', month: '2-digit', year: 'numeric', hour12: false }"
+                          :mandatory="field.mandatory">
+                          <template #display="{ model }">
+                            {{ model }}
+                          </template>
+                        </CalendarField>
+                      </template>
+
+                      <template v-if="field.user_type_id == 'datetime'">
+                        <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
+                          :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
+                          :selectionMode="'single'" :showTime="true" :data-field-name="field.field_name"
+                          :mandatory="field.mandatory">
+                          <template #display="{ model }">
+                            {{ model }}
+                          </template>
+                        </CalendarField>
+                      </template>
+
+                      <template v-if="field.user_type_id == 'enumirate'">
+                        <EnumField v-model="field.values" :fieldTitle="field.title" :changeMode="changeMode"
+                          :key="field.id" :validItems="field.user_field" :template="field.value_tmpl"
+                          :data-field-name="field.field_name" @update:modelValue="(value) => { updateUF(value, field) }"
+                          :mandatory="field.mandatory" />
+                      </template>
+
+                      <!-- TODO Добавить оставшиеся поля + файлы -->
+                    </template>
+                  </div>
+                </template>
+              </FieldsCard>
+            </div>
+
+            <div class="deal-timeline"></div>
           </TabPanel>
           <TabPanel value="1">
             <p class="m-0">
@@ -148,102 +246,15 @@ const updateUF = (value, field) => {
             </p>
           </TabPanel>
         </TabPanels>
-      </Tabs> -->
+      </Tabs>
 
-      <div class="deal-field">
-        <FieldsCard @save="saveDeal" class="mb-1">
-          <template #header>Общая</template>
-          <template #default="{ changeMode }">
-            <div class="field-wrapper">
-              <StringField v-model="deal_detail.title" v-if="changeMode" :fieldTitle="'Наименование сделки'"
-                :changeMode="changeMode" />
-              <NumberField v-model="deal_detail.opportunity" :fieldTitle="'Сумма'" :changeMode="changeMode"
-                :useGrouping="true" :suffix="' ₽'">
-                <template #display="{ model }">
-                  <span style="font-size: 20px; font-weight: 300">{{ model ? model.toMonetarily() : "" }}</span>
-                </template>
-              </NumberField>
-              <BoolenField v-model="deal_detail.is_new" :fieldTitle="'Новая сделка'" :changeMode="changeMode"
-                :binary="true" :trueValue="1" :falseValue="0" />
-              <CalendarField v-model="deal_detail.date_create" :fieldTitle="'Дата создания'" :changeMode="false"
-                :dateFormat="'dd.mm.yy'" :showTime="true" />
-              <CalendarField v-model="deal_detail.date_modify" :fieldTitle="'Дата изменения'" :changeMode="false"
-                :dateFormat="'dd.mm.yy'" :showTime="true" />
-            </div>
-          </template>
-        </FieldsCard>
-
-        <FieldsCard @save="saveDeal">
-          <template #header>Пользовательские поля</template>
-          <template #default="{ changeMode }">
-            <div class="field-wrapper">
-              <template v-for="field in deal_detail.uf_list">
-                <template v-if="field.user_type_id == 'string'">
-                  <StringField v-model="field.values[0].value" :fieldTitle="field.title" :changeMode="changeMode"
-                    :key="field.id" :data-field-name="field.field_name" />
-                </template>
-
-                <template v-if="field.user_type_id == 'boolean'">
-                  <BoolenField v-model="field.values[0].value_int" :fieldTitle="field.title" :changeMode="changeMode"
-                    :key="field.id" :binary="true" :trueValue="1" :falseValue="0" :data-field-name="field.field_name" />
-                </template>
-
-                <template v-if="field.user_type_id == 'number'">
-                  <NumberField v-model="field.values[0].value_double" :fieldTitle="field.title" :changeMode="changeMode"
-                    :key="field.id" :maxFractionDigits="2" :data-field-name="field.field_name">
-                    <template #display="{ model }">
-                      {{ model }}
-                    </template>
-                  </NumberField>
-                </template>
-
-                <template v-if="field.user_type_id == 'integer'">
-                  <NumberField v-model="field.values[0].value_int" :fieldTitle="field.title" :changeMode="changeMode"
-                    :key="field.id" :maxFractionDigits="0" :data-field-name="field.field_name">
-                    <template #display="{ model }">
-                      {{ model }}
-                    </template>
-                  </NumberField>
-                </template>
-
-                <template v-if="field.user_type_id == 'date'">
-                  <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
-                    :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
-                    :selectionMode="'single'" :data-field-name="field.field_name"
-                    :options="{ day: '2-digit', month: '2-digit', year: 'numeric', hour12: false }">
-                    <template #display="{ model }">
-                      {{ model }}
-                    </template>
-                  </CalendarField>
-                </template>
-
-                <template v-if="field.user_type_id == 'datetime'">
-                  <CalendarField v-model="field.values[0].value_datetime" :fieldTitle="field.title"
-                    :changeMode="changeMode" :key="field.id" dateFormat="dd.mm.yy" :manualInput="false"
-                    :selectionMode="'single'" :showTime="true" :data-field-name="field.field_name">
-                    <template #display="{ model }">
-                      {{ model }}
-                    </template>
-                  </CalendarField>
-                </template>
-
-                <template v-if="field.user_type_id == 'enumirate'">
-                  <EnumField v-model="field.values" :fieldTitle="field.title" :changeMode="changeMode" :key="field.id"
-                    :validItems="field.user_field" :template="field.value_tmpl" :data-field-name="field.field_name"
-                    @update:modelValue="(value) => { updateUF(value, field) }" />
-                </template>
-
-                <!-- TODO Добавить оставшиеся поля -->
-              </template>
-            </div>
-          </template>
-        </FieldsCard>
+      <div v-if="isNew" class="pl-save-panel">
+        <Button @click="createDeal" >Сохранить</Button>
+        <Button @click="router.push({ path: '/crm/deal/kanban/' })" severity="secondary">Отменить</Button>
       </div>
-
-      <div class="deal-timeline"></div>
     </div>
 
-    <pre>{{ deal_detail }}</pre>
+    <!-- <pre>{{ deal_detail }}</pre> -->
   </Sidebar>
 </template>
 
@@ -278,7 +289,8 @@ const updateUF = (value, field) => {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100%;
+    height: 93%; // TODO сделать вычисленипе js
+    // position: relative;
 
     .deal-field {
       width: 40%;
@@ -295,6 +307,56 @@ const updateUF = (value, field) => {
     .deal-timeline {
       width: 60%;
       height: 100%;
+    }
+
+    .pl-save-panel {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      width: 100%;
+      background: white;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      button {
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+#deal-detail-main-tabs {
+  width: 100%;
+
+  .d-flex {
+    display: flex
+  }
+
+  .p-tabpanels,
+  .p-tablist-tab-list {
+    background: none;
+  }
+
+  .p-tabpanels {
+    height: 100%;
+  }
+  
+  .p-tabpanel {
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .p-tabpanels.__new-mode .p-tabpanel {
+    height: calc(100% - 45px);
+  }
+  
+  .p-tablist-tab-list {
+    button {
+      background: white;
+      border-radius: 10px 10px 0 0;
+      margin-right: 1px;
     }
   }
 }

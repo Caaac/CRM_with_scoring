@@ -1,11 +1,26 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 const emits = defineEmits(['save'])
+const props = defineProps({
+  changeMode: {
+    type: Boolean,
+    default: false
+  },
+  hideModeBtn: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const changeMode = ref(false)
 
-watch(changeMode, (n, _) => { if (!n) emits('save') })
+onMounted(() => {
+  changeMode.value = props.changeMode
+})
+
+watch(changeMode, (n, _) => { if (!n && !props.hideModeBtn.valueOf) emits('save') })
+watch(() => props.changeMode, (n, _) => { changeMode.value = n })
 
 </script>
 
@@ -13,7 +28,7 @@ watch(changeMode, (n, _) => { if (!n) emits('save') })
   <div class="fields-card">
     <div class="fields-card-header">
       <div class="card-title"><slot name="header"></slot></div>
-      <div @click="changeMode = !changeMode" class="card-controller">{{ changeMode ? 'сохранить' : 'изменить' }}</div>
+      <div v-if="!props.hideModeBtn" @click="changeMode = !changeMode" class="card-controller">{{ changeMode ? 'сохранить' : 'изменить' }}</div>
     </div>
     <div class="divider"></div>
     <div class="fields-card-body">

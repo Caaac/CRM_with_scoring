@@ -12,6 +12,12 @@ const kanbanStyles = ref({})
 const kanbanContainer = ref(null)
 
 onMounted(() => {
+  setTimeout(() => {
+    console.log({
+      'userStages': props.userStages,
+      'sysStatus': props.sysStatus
+    });
+  }, 2000);
   
   kanbanStyles.value.height = 500 + 'px'
 })
@@ -29,6 +35,9 @@ onMounted(() => {
           </div>
           <div v-if="$slots.addItem" class="column-item-add-container">
             <slot name="addItem" :stage="stage.status_data"></slot>
+          </div>
+          <div v-if="$slots.opportunity" class="kanban-stage-sum">
+            <slot name="opportunity" :opportunity="stage.sum_opportunity"></slot>
           </div>
         </div>
         <div class="kanban-column-body">
@@ -75,9 +84,20 @@ onMounted(() => {
         .column-title {
           padding: 3px 10px;
           font-weight: 600;
-          // width: 95%;
           width: 100%;
           border-radius: 0 16px 16px 0;
+        }
+
+        .kanban-stage-sum {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          padding: 3px 10px;
+          font-weight: 600;
+          border-radius: 16px;
+          background-color: white !important;
+          margin-top: 5px;
+          border: 1px solid #dddddd;
         }
       }
 

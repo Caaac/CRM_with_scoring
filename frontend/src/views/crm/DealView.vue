@@ -75,6 +75,9 @@ const menuItems = computed(() => {
           </div>
         </KanbanCard>
       </template>
+      <template #opportunity="slotProps">
+        {{ (slotProps.opportunity || 0).toMonetarily() }}
+      </template>
     </Kanban>
 
     <RouterView />

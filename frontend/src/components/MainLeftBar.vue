@@ -1,6 +1,8 @@
 <script setup>
 /* PrimeVue components */
 import Image from "primevue/image";
+/* Custom icons */
+import crmicon from "@/assets/icons/menu/CrmIcon.vue";
 /* Vue */
 import { useRouter } from "vue-router";
 import { computed } from "vue";
@@ -16,7 +18,7 @@ const menuItems = computed(() => {
 
     routes.forEach(element => {
       if (element.meta && element.meta.display) {
-        items.push({...element.meta, name: element.name});
+        items.push({ ...element.meta, name: element.name });
       }
 
       if (element.children) {
@@ -42,11 +44,12 @@ const menuItems = computed(() => {
     </div>
 
     <div class="menu-items">
-      <div v-for="item in menuItems" :key="item" class="menu-item">
-        <!-- <span class="mdi mdi-application-edit-outline"></span> -->
-        <span @click="router.push({ name: item.name })" class="menu-item-title">{{ item.title }}</span>
+      <div v-for="item in menuItems" :key="item" @click="router.push({ name: item.name })" class="menu-item">
+        <div :class="item.icon" class="menu-item-icon"></div>
+        <span class="menu-item-title">{{ item.title }}</span>
       </div>
     </div>
+
   </header>
 </template>
 
@@ -79,18 +82,25 @@ header {
     display: flex;
     flex-direction: column;
     margin-top: 60px;
+    padding: 0 40px;
 
     .menu-item {
       display: flex;
       flex-direction: row;
-      justify-content: center;
+      justify-content: start;
       align-items: center;
       margin-bottom: 10px;
       color: var(--color-text);
 
+      .menu-item-icon {
+        font-size: var(--menu-icon-size);
+        color: var(--menu-icon-color)
+      }
+
       .menu-item-title {
-        font-size: 16px;
-        font-weight: 500;
+        font-size: var(--menu-text-size);
+        font-weight: 600;
+        margin-left: 10px;
       }
     }
 

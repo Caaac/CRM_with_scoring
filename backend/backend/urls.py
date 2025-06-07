@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.conf.urls.static import static
 from backend.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
-
+from rest_framework_simplejwt.views import TokenRefreshView
 from . import views, auth
 
 urlpatterns = [
@@ -27,7 +27,10 @@ urlpatterns = [
     
     re_path(r'^(?P<mode>install|uninstall)/(?P<module>[a-z]+)/?$', views.db_control),
     path('api/v1/drf-auth/', include('rest_framework.urls')),
+    
     path('auth/login/', auth.Auth.login),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('auth/login/', auth.Auth.login),
 ]
 
 if DEBUG:

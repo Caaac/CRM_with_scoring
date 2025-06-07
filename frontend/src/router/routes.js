@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: "/",
@@ -14,7 +13,7 @@ const routes = [
       title: "CRM",
       display: true,
       sort: 100,
-      icon: "mdi mdi-application-edit-outline",
+      icon: "mdi mdi-chart-box-multiple-outline",
     },
     redirect: (to) => ({ path: "/crm/deal/kanban/" }),
     children: [
@@ -41,7 +40,7 @@ const routes = [
           title: "Контакты",
           display: true,
           sort: 200,
-          icon: "mdi mdi-application-edit-outline",
+          icon: "mdi mdi-account-group",
         },
         redirect: (to) => ({ path: "/crm/contact/list/" }),
         children: [
@@ -61,23 +60,6 @@ const routes = [
       },
     ],
   },
-  // {
-  //   path: '/contact/',
-  //   name: 'contact',
-  //   meta: {
-  //     title: 'Контакты',
-  //     display: true,
-  //     icon: "mdi mdi-application-edit-outline",
-  //   },
-  //   redirect: (to) => ({ path: "//deal/kanban/" }),
-  //   children: [
-  //     {
-  //       path: "list/",
-  //     }
-  //   ]
-
-  //   // component: () => import("@/views/crm/ContactView.vue"),
-  // },
   {
     path: "/settings/",
     name: "settings",
@@ -98,7 +80,7 @@ const routes = [
       },
       {
         path: "kanban/stages/",
-        name: "uf-deal-detail",
+        name: "uf-kanban-stage",
         component: () => import("@/components/settings/crm/kanban/Stage.vue"),
       },
     ],

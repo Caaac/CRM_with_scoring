@@ -7,9 +7,15 @@ import MainTopBar from '@/components/MainTopBar.vue';
 import Login from '@/components/auth/Login.vue';
 /* Store */
 import { rootStore } from './stores';
-import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
+/* Vue v3 */
+import { onMounted } from 'vue';
 
 const store = rootStore()
+
+onMounted(() => {
+  store.auth().initTimer()
+})
 
 </script>
 

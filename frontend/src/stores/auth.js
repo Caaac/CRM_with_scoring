@@ -5,12 +5,18 @@ import { defineStore } from "pinia";
 import { helperStore } from "./helper";
 
 export const authStore = defineStore("auth", () => {
-  const helper = helperStore
+  const helper = helperStore()
 
   /* public */
   const isAuth = ref(true);
   /* private */
   const authTimer = ref(null);
+
+  const initTimer = () => {
+    console.log('initTimer', localStorage.getItem('authTimer'));
+    if (localStorage.getItem('authTimer'))
+      startTimer()
+  }
 
   const login = (authData) => {
     Rest.callMethod(
@@ -23,7 +29,7 @@ export const authStore = defineStore("auth", () => {
         switch (r.status) {
           case 200:
             setToken(r.data.access, r.data.refresh)
-            // isAuth.value = true
+            isAuth.value = true
             startTimer()
             break;
           case 400:
@@ -44,30 +50,35 @@ export const authStore = defineStore("auth", () => {
     localStorage.setItem('refreshToken', refresh);
   }
 
-  const startTimer = (interval = 4.5) => {
+  const startTimer = (interval = 14) => {
+    localStorage.removeItem('authTimer')
+
     authTimer.value = setInterval(() => {
-      // Rest.callMethod(
-      //   'auth.refresh',
-      //   {},
-      //   (r) => {
-      //     if (r.status == 200) {
-      //       setToken(r.data.access, r.data.refresh)
-      //     }
-      //   }
-      // )
+      console.log('authTimer');
+      Rest.callMethod(
+        'auth.refresh',
+        {refresh: localStorage.getItem('refreshToken')},
+        (r) => {
+          if (r.status == 200) {
+            setToken(r.data.access, r.data.refresh)
+          }
+        }
+      )
     }, interval * 60 * 1000)
+
+    localStorage.setItem('authTimer', authTimer.value);
   }
 
   const stopTimer = () => {
     clearInterval(authTimer.value)
   }
 
-  // const 
-
   return {
     /* Store vars */
     isAuth,
     /* Store methods */
-    login
+    login,
+    initTimer,
+    stopTimer
   };
 });
