@@ -1,6 +1,10 @@
 # import another
-from .classes.settings import UserFieldsListView, UserFieldDetailsView
 from .classes.deal import DealDetail
+from .classes.settings import (
+    StageView,
+    UserFieldsListView, 
+    UserFieldDetailsView, 
+)
 
 import os
 import json

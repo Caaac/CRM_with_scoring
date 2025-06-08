@@ -13,7 +13,9 @@ urlpatterns = [
     re_path(r'^deal/(?P<mode>kanban|list)/?$', views.PageInit.crmDealInit),
 
     # Settings
+    ## Stages
+    re_path(r'^stage/?$', views.StageView.as_view()),
     ## User-Field
-    re_path(r'^settings/user-field/?$', views.UserFieldsListView.as_view()),
-    re_path(r'^settings/user-field-detail/?$', views.UserFieldDetailsView.as_view()),
+    re_path(r'^user-field/?$', views.UserFieldsListView.as_view()),
+    re_path(r'^user-field-detail/?$', views.UserFieldDetailsView.as_view()),
 ]

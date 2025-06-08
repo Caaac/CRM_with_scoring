@@ -64,7 +64,7 @@ class CrmStatus(models.Model):
     status_id = models.CharField(db_column='STATUS_ID', max_length=255)
     title = models.CharField(db_column='TITLE', max_length=255)
     color = models.CharField(db_column='COLOR', max_length=255)
-    system_status = models.IntegerField(db_column='SYSTEM_STATUS')
+    system_status = models.IntegerField(db_column='SYSTEM_STATUS', default=0)
     semantics = models.CharField(db_column='SEMANTICS', max_length=1, blank=True, null=True)
     sort = models.BigIntegerField(db_column='SORT')
 
