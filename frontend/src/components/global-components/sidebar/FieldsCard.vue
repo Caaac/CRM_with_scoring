@@ -19,7 +19,7 @@ onMounted(() => {
   changeMode.value = props.changeMode
 })
 
-watch(changeMode, (n, _) => { if (!n && !props.hideModeBtn.valueOf) emits('save') })
+watch(changeMode, (n, _) => { if (!n && !props.hideModeBtn.value) emits('save') })
 watch(() => props.changeMode, (n, _) => { changeMode.value = n })
 
 </script>

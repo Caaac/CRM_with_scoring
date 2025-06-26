@@ -61,6 +61,17 @@ const routes = [
     ],
   },
   {
+    path: '/reports/',
+    name: 'reports',
+    meta: {
+      title: 'Отчеты',
+      display: true,
+      sort: 300,
+      icon: 'mdi mdi-chart-bar',
+    },
+    // component: () => import("@/views/reports/ReportsView.vue"),
+  },
+  {
     path: "/settings/",
     name: "settings",
     meta: {

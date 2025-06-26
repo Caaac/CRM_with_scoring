@@ -5,6 +5,7 @@ import Tabs from 'primevue/tabs';
 import Button from 'primevue/button';
 import Sidebar from "primevue/sidebar";
 import TabList from 'primevue/tablist';
+import Message from 'primevue/message';
 import Skeleton from "primevue/skeleton";
 import TabPanel from 'primevue/tabpanel';
 import TabPanels from 'primevue/tabpanels';
@@ -77,6 +78,7 @@ const finalStageStyle = computed(() => {
 
 
 const saveDeal = () => {
+  store.helper().infoToast('Обновлен результат рассмотреня заявки "Новая сделка"');
   // TODO: check mandatory fields
   store.crm().deal().updateDealDetail(deal_detail.value.id, deal_detail.value, false, true)
 }
@@ -95,11 +97,32 @@ const updateUF = (value, field) => {
   console.log(value, field);
 }
 
+
+/**
+ * For testing
+ */
+const selCon = ref(1)
+const conList = ref([
+  {
+    id: 1,
+    value: 'Михайлов Олег Валентинович'
+  },
+  {
+    id: 2,
+    value: 'Зайцев Константин Николаевич'
+  },
+  {
+    id: 3,
+    value: 'test3'
+  }
+])
+
+
 </script>
 
 <template>
-  <Sidebar v-model:visible="visiblee" @hide="router.push({ path: '/crm/deal/kanban/' }); store.crm().deal().init()" id="deal-detail-sidebar"
-    class="propel-sidebar" position="right">
+  <Sidebar v-model:visible="visiblee" @hide="router.push({ path: '/crm/deal/kanban/' }); store.crm().deal().init()"
+    id="deal-detail-sidebar" class="propel-sidebar" position="right">
     <template #header>
       <Skeleton v-if="loading.deal_detail" class="sidebar-skeleton-header"></Skeleton>
       <span class="sidebar-header"> {{ deal_detail.title }} </span>
@@ -154,6 +177,12 @@ const updateUF = (value, field) => {
                       :dateFormat="'dd.mm.yy'" :showTime="true" />
                     <CalendarField v-model="deal_detail.date_modify" :fieldTitle="'Дата изменения'" :changeMode="false"
                       :dateFormat="'dd.mm.yy'" :showTime="true" />
+
+                    <EnumField v-model="selCon" :fieldTitle="'Контакт'" :changeMode="changeMode"
+                      :validItems="conList" :data-field-name="'Контакт'"
+                      @update:modelValue="(value) => { updateUF(value, field) }" :mandatory="true">
+                      <template #test>Михайлов Олег Валентинович</template>
+                    </EnumField>
                   </div>
                 </template>
               </FieldsCard>
@@ -234,22 +263,15 @@ const updateUF = (value, field) => {
             <div class="deal-timeline"></div>
           </TabPanel>
           <TabPanel value="1">
-            <p class="m-0">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
-              rem
-              aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-              explicabo.
-              Nemo enim
-              ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos
-              qui
-              ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-            </p>
+            <Button>Отправить заявку на рассмотрение</Button>
+
+            <Message severity="success" style="margin-top: 20px;"></Message>
           </TabPanel>
         </TabPanels>
       </Tabs>
 
       <div v-if="isNew" class="pl-save-panel">
-        <Button @click="createDeal" >Сохранить</Button>
+        <Button @click="createDeal">Сохранить</Button>
         <Button @click="router.push({ path: '/crm/deal/kanban/' })" severity="secondary">Отменить</Button>
       </div>
     </div>
@@ -342,16 +364,16 @@ const updateUF = (value, field) => {
   .p-tabpanels {
     height: 100%;
   }
-  
+
   .p-tabpanel {
     height: 100%;
     overflow-y: auto;
   }
-  
+
   .p-tabpanels.__new-mode .p-tabpanel {
     height: calc(100% - 45px);
   }
-  
+
   .p-tablist-tab-list {
     button {
       background: white;

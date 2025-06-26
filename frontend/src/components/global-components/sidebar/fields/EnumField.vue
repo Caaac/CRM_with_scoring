@@ -50,6 +50,7 @@ const addNewItem = () => {
       <div class="field-value field-enum">
         <div v-for="(enumElement, index) in model" :key="enumElement.id" class="field-enum-item">
           <template v-if="!props.changeMode">
+            <slot name="test"></slot>
             {{ getItemById(enumElement.value_int)?.value }}
           </template>
           <template v-else>

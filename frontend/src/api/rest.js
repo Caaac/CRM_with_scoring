@@ -79,6 +79,8 @@ class RestService {
   }
 
   async runQuery(serverData, params, headers = {}) {
+    
+
     return await this.getInstanse(serverData, params, headers);
   }
 
@@ -90,15 +92,18 @@ class RestService {
     } else if (serverData.method == "PUT") {
       return instance.put(serverData.path, params, { headers: { ...headers } });
     } else if (serverData.method == "DELETE") {
-      return instance.delete(serverData.path, { data: params }, { headers: { ...headers } });
+      return instance.delete(serverData.path, { data: params, headers: { ...headers } });
     }
   }
 
   getHeaders(method) {
     switch (method) {
       case "auth.login":
+        console.log('!111');
+        
         return {}
       default:
+        console.log('!222');
         return {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         };
