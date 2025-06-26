@@ -4,15 +4,21 @@
 
 ### Фронтенд выполнен на Vue3 Composition API с ипользованием Router, Pinia, PrimeVue. Реализован механиз Drag&Drop. Для Http запросов используется axios
 
+### Реализован класс-обертка `RestService` для работы с REST и отправки запросов пакетами
+
 ## Backend
 
 ### Серверная часть реализована на Django с собственным API для работы с MySQL
 
+### Реализована авторизация по JWT токену 
+
 ## Инструкции
+
+
 
 Запустить проект комплексном
 ```sh
-docker-compose up
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
 Для запуска контейтера с фронтом
